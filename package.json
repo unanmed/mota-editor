@@ -3,6 +3,8 @@
   "private": true,
   "version": "0.0.0",
   "main": "dist-electron/index.js",
+  "author": "unanmed",
+  "description": "An desktop editor for mota-js",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build && electron-builder",
