@@ -1,6 +1,6 @@
 import { app, BrowserWindow } from 'electron';
 import { resolve } from 'path';
-import { injectWithWindow } from './process/inject';
+import { injectCommonModules, injectWithWindow } from './process/inject';
 
 const createWindow = () => {
     const win = new BrowserWindow({
@@ -11,8 +11,9 @@ const createWindow = () => {
         height: 600
     });
 
+    // 注入主进程与渲染进程通信函数
     injectWithWindow(win);
-    win.webContents.openDevTools();
+    injectCommonModules();
 
     if (process.env.VITE_DEV_SERVER_URL) {
         win.loadURL(process.env.VITE_DEV_SERVER_URL);
