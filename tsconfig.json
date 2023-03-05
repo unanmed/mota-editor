@@ -18,7 +18,8 @@
         "src/**/*.d.ts",
         "src/**/*.tsx",
         "src/**/*.vue",
-        "electron/**/*.ts"
+        "electron/**/*.ts",
+        "electron/preload/index.js"
     ],
     "references": [{ "path": "./tsconfig.node.json" }]
 }

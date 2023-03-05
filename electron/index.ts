@@ -1,14 +1,18 @@
 import { app, BrowserWindow } from 'electron';
 import { resolve } from 'path';
+import { injectWithWindow } from './process/inject';
 
 const createWindow = () => {
     const win = new BrowserWindow({
         webPreferences: {
-            contextIsolation: false,
-            nodeIntegration: true,
-            preload: resolve(__dirname, './preload/index.js')
-        }
+            preload: resolve(__dirname, '../electron/preload/index.js')
+        },
+        width: 800,
+        height: 600
     });
+
+    injectWithWindow(win);
+    win.webContents.openDevTools();
 
     if (process.env.VITE_DEV_SERVER_URL) {
         win.loadURL(process.env.VITE_DEV_SERVER_URL);
