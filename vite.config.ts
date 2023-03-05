@@ -11,5 +11,12 @@ export default defineConfig({
             entry: 'electron/index.ts'
         }),
         jsx()
-    ]
+    ],
+    css: {
+        preprocessorOptions: {
+            less: {
+                javascriptEnabled: true
+            }
+        }
+    }
 });
