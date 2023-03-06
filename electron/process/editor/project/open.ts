@@ -1,6 +1,6 @@
 import { dialog, ipcMain } from 'electron';
 import { resolve } from 'path';
-import { MotaProject } from './project';
+import { MotaProject, projectList } from './project';
 
 export class ProjectSelector {
     /**
@@ -51,4 +51,5 @@ export function injectProjectSelector() {
     ipcMain.handle('project.selectFolder', (e, path) =>
         selector.selectFromFolder(path)
     );
+    ipcMain.handle('project.close', (e, index) => projectList[index].close());
 }

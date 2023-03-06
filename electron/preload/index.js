@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('editor', {
     project: {
         select: () => ipcRenderer.invoke('project.select'),
         open: path => ipcRenderer.invoke('project.open', path),
-        selectFolder: path => ipcRenderer.invoke('project.selectFolder', path)
+        selectFolder: path => ipcRenderer.invoke('project.selectFolder', path),
+        close: index => ipcRenderer.invoke('project.close', index)
     }
 });
