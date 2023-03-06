@@ -8,12 +8,14 @@ const createWindow = () => {
             preload: resolve(__dirname, '../electron/preload/index.js')
         },
         width: 800,
-        height: 600
+        height: 600,
+        titleBarStyle: 'hidden'
     });
 
     // 注入主进程与渲染进程通信函数
     injectWithWindow(win);
     injectCommonModules();
+    win.setMenuBarVisibility(false);
 
     if (process.env.VITE_DEV_SERVER_URL) {
         win.loadURL(process.env.VITE_DEV_SERVER_URL);

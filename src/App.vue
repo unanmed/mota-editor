@@ -12,8 +12,6 @@ onMounted(() => {
     if (import.meta.env.DEV) {
         document.addEventListener('keyup', e => {
             const key = extractKeyCode(e);
-            console.log(key);
-
             if (key === KeyCode.F12) window.dev.open();
         });
     }
