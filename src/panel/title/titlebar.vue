@@ -46,7 +46,7 @@ onMounted(() => {
 <style lang="less" scoped>
 #title-bar {
     width: 100%;
-    height: 40px;
+    height: 42px;
     background-color: #444;
     -webkit-app-region: drag;
     user-select: none;

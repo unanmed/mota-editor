@@ -1,5 +1,6 @@
 import { app, BrowserWindow } from 'electron';
 import { resolve } from 'path';
+import { writeAllConfigFiles } from './process/config/control';
 import { injectCommonModules, injectWithWindow } from './process/inject';
 
 const createWindow = () => {
@@ -36,7 +37,8 @@ app.whenReady().then(() => {
     });
 });
 
-app.on('window-all-closed', () => {
+app.on('window-all-closed', async () => {
+    await writeAllConfigFiles();
     if (process.platform !== 'darwin') {
         app.quit();
     }

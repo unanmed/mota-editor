@@ -1,4 +1,4 @@
-import { reactive, Ref, shallowReactive } from 'vue';
+import { Ref, shallowReactive } from 'vue';
 
 interface MenuData {
     text: string;
@@ -22,6 +22,9 @@ export class Menu {
     x: number = 0;
     y: number = 0;
     width: number = 200;
+
+    enter?: () => void;
+    leave?: () => void;
 
     private events: Partial<Record<MenuEventType, MenuEvent[]>> = {};
 
@@ -53,6 +56,16 @@ export class Menu {
     setPos(x: number, y: number) {
         this.x = x;
         this.y = y;
+    }
+
+    /**
+     * 设置当鼠标在元素上时的效果
+     * @param enter 鼠标进入时
+     * @param leave 鼠标离开时
+     */
+    hover(enter: () => void, leave: () => void) {
+        this.enter = enter;
+        this.leave = leave;
     }
 
     /**
@@ -91,6 +104,7 @@ export class MenuController {
      * @param menu 菜单
      */
     add(menu: Menu) {
+        if (this.list.includes(menu)) return;
         this.list.push(menu);
         menu.dispose('mount');
     }
@@ -130,7 +144,25 @@ export class MenuController {
     }
 }
 
-export const recentMenu = new Menu([]);
+export const recentMenu = new Menu([
+    {
+        text: '打开全部',
+        shortcut: 'Ctrl + Alt + A',
+        fn: () => {
+            console.log(7);
+        }
+    },
+    'divider',
+    ...(await window.editor.project.getRecent()).map(v => {
+        return {
+            text: v,
+            fn: () => {
+                console.log(20);
+            }
+        };
+    })
+]);
+recentMenu.width = 300;
 
 export const fileMenu = new Menu([
     {
@@ -168,14 +200,106 @@ export const fileMenu = new Menu([
         fn: () => {
             console.log(4);
         }
+    },
+    'divider',
+    {
+        text: '关闭项目',
+        shortcut: 'Ctrl + F4',
+        fn: () => {
+            console.log(6);
+        }
+    },
+    {
+        text: '关闭所有项目',
+        shortcut: 'Ctrl + Alt + F4',
+        fn: () => {
+            console.log(8);
+        }
+    },
+    {
+        text: '关闭当前编辑器',
+        shortcut: 'Alt + F4',
+        fn: () => {
+            console.log(9);
+        }
+    },
+    'divider',
+    {
+        text: '退出',
+        fn: () => {
+            console.log(10);
+        }
     }
 ]);
 fileMenu.setPos(48, 40);
 fileMenu.width = 300;
 
-export const editMenu = new Menu([]);
+export const editMenu = new Menu([
+    {
+        text: '撤销',
+        shortcut: 'Ctrl + Z',
+        fn: () => {
+            console.log(11);
+        }
+    },
+    {
+        text: '恢复',
+        shortcut: 'Ctrl + Y',
+        fn: () => {
+            console.log(12);
+        }
+    },
+    'divider',
+    {
+        text: '剪切',
+        shortcut: 'Ctrl + X',
+        fn: () => {
+            console.log(13);
+        }
+    },
+    {
+        text: '复制',
+        shortcut: 'Ctrl + C',
+        fn: () => {
+            console.log(14);
+        }
+    },
+    {
+        text: '粘贴',
+        shortcut: 'Ctrl + V',
+        fn: () => {
+            console.log(15);
+        }
+    }
+]);
+editMenu.setPos(104, 40);
+editMenu.width = 300;
 
-export const gameMenu = new Menu([]);
+export const gameMenu = new Menu([
+    {
+        text: '进入游戏',
+        shortcut: 'Ctrl + E',
+        fn: () => {
+            console.log(16);
+        }
+    },
+    {
+        text: '在新窗口进入游戏',
+        shortcut: 'Ctrl + Shift + E',
+        fn: () => {
+            console.log(18);
+        }
+    },
+    {
+        text: '关闭当前游戏',
+        shortcut: 'Ctrl + Alt + E',
+        fn: () => {
+            console.log(19);
+        }
+    }
+]);
+gameMenu.setPos(160, 40);
+gameMenu.width = 350;
 
 export const menuDict = {
     file: fileMenu,

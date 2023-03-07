@@ -1,6 +1,7 @@
 import { resolve } from 'path';
 import { includesAll } from '../../../utils/extend';
 import fs from 'fs/promises';
+import { first } from '../../config/firstConfig';
 
 export interface FileData {
     name: string;
@@ -51,6 +52,7 @@ export interface MotaProjectData {
     index: FileData;
     style: FileData;
     structure: Structure;
+    path: string;
 }
 
 export const projectList: MotaProject[] = [];
@@ -65,17 +67,20 @@ export class MotaProject {
     /** 当前目录是否合法 */
     valid: boolean = true;
 
-    private testPromise = new Promise<void>(res => res());
+    private testPromise: Promise<void>;
 
     constructor(path: string) {
         this.dir = path;
-        this.testPromise.then(async () => {
-            if (!(await this.test())) {
-                this.valid = false;
-            } else {
-                this.info = this.getProjectInfo();
-                this.name = this.info.name;
-            }
+        this.testPromise = new Promise(res => {
+            (async () => {
+                if (!(await this.test())) {
+                    this.valid = false;
+                } else {
+                    this.info = await this.getProjectInfo();
+                    this.name = this.info.name;
+                }
+                res();
+            })();
         });
     }
 
@@ -191,11 +196,22 @@ export class MotaProject {
             mainInfo,
             material,
             libs,
-            structure
+            structure,
+            path: this.dir
         };
 
         console.log(`open project ${this.name} success.`);
         projectList.push(this);
+        const config = first.data!;
+        config.recent ??= [];
+        if (config.recent.length > 10) {
+            config.recent.shift();
+        }
+        if (config.recent.includes(this.dir)) {
+            config.recent = config.recent.filter(v => v !== this.dir);
+        }
+        config.recent.push(this.dir);
+        await first.writeToFile();
 
         return project;
     }

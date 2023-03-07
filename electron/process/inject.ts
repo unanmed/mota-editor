@@ -1,5 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron';
 import { openDevTools } from './dev/dev';
+import { injectPrpjectInterface } from './editor/project/interface';
 import { injectProjectSelector } from './editor/project/open';
 
 export function injectWithWindow(win: BrowserWindow) {
@@ -8,4 +9,5 @@ export function injectWithWindow(win: BrowserWindow) {
 
 export function injectCommonModules() {
     injectProjectSelector();
+    injectPrpjectInterface();
 }

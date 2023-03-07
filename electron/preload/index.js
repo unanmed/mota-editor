@@ -10,6 +10,7 @@ contextBridge.exposeInMainWorld('editor', {
         select: () => ipcRenderer.invoke('project.select'),
         open: path => ipcRenderer.invoke('project.open', path),
         selectFolder: path => ipcRenderer.invoke('project.selectFolder', path),
-        close: index => ipcRenderer.invoke('project.close', index)
+        close: path => ipcRenderer.invoke('project.close', path),
+        getRecent: () => ipcRenderer.invoke('project.recent')
     }
 });

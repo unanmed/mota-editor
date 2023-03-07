@@ -51,5 +51,7 @@ export function injectProjectSelector() {
     ipcMain.handle('project.selectFolder', (e, path) =>
         selector.selectFromFolder(path)
     );
-    ipcMain.handle('project.close', (e, index) => projectList[index].close());
+    ipcMain.handle('project.close', (e, path) =>
+        projectList.find(v => v.dir === path)?.close()
+    );
 }
