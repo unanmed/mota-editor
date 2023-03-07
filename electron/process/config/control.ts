@@ -13,7 +13,7 @@ export class ConfigController<T> {
 
     constructor(file: string, defaultValue?: T) {
         const usr = app.getPath('userData');
-        this.path = resolve(usr, file);
+        this.path = resolve(usr, 'config', file);
         this.readyPromise = new Promise(async res => {
             await ensureFile(this.path);
             let str = await fs.readFile(this.path, 'utf-8');

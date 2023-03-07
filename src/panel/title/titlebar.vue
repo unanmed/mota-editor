@@ -20,7 +20,8 @@ const toolList = {
     file: '项目',
     edit: '编辑',
     game: '游戏',
-    other: '其他'
+    other: '其他',
+    help: '帮助'
 };
 
 let showed: boolean = false;

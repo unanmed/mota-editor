@@ -186,6 +186,13 @@ export const fileMenu = new Menu([
         },
         child: recentMenu
     },
+    {
+        text: '打开在线工程',
+        shortcut: 'Ctrl + Shift + O',
+        fn: () => {
+            console.log(28);
+        }
+    },
     'divider',
     {
         text: '保存',
@@ -330,11 +337,35 @@ export const otherMenu = new Menu([
 ]);
 otherMenu.setPos(216, 40);
 
+export const helpMenu = new Menu([
+    {
+        text: '使用说明',
+        fn: () => {
+            console.log(25);
+        }
+    },
+    {
+        text: '获取帮助',
+        fn: () => {
+            console.log(27);
+        }
+    },
+    'divider',
+    {
+        text: '检查更新',
+        fn: () => {
+            console.log(26);
+        }
+    }
+]);
+helpMenu.setPos(272, 40);
+
 export const menuDict = {
     file: fileMenu,
     edit: editMenu,
     game: gameMenu,
-    other: otherMenu
+    other: otherMenu,
+    help: helpMenu
 };
 
 export const menus = new MenuController();

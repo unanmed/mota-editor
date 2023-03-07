@@ -53,6 +53,7 @@ export interface MotaProjectData {
     style: FileData;
     structure: Structure;
     path: string;
+    extensions: FileData[];
 }
 
 export const projectList: MotaProject[] = [];
@@ -136,6 +137,20 @@ export class MotaProject {
             'utf-8'
         );
 
+        // 拓展插件
+        const exList = await fs.readdir(resolve(this.dir, 'extensions'));
+        const ex: string[] = [];
+        for await (const one of exList) {
+            const stat = await fs.stat(resolve(this.dir, 'extensions', one));
+            if (stat.isFile()) ex.push(one);
+        }
+
+        const extensions = await this.readDirContent(
+            resolve(this.dir, 'extensions'),
+            ex,
+            'utf-8'
+        );
+
         // 根目录的三个重要文件
         const main = await this.readFile(this.dir, 'main.js', 'utf-8');
         const index = await this.readFile(this.dir, 'index.html', 'utf-8');
@@ -197,7 +212,8 @@ export class MotaProject {
             material,
             libs,
             structure,
-            path: this.dir
+            path: this.dir,
+            extensions
         };
 
         console.log(`open project ${this.name} success.`);
