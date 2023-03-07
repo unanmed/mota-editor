@@ -9,7 +9,12 @@ const createWindow = () => {
         },
         width: 800,
         height: 600,
-        titleBarStyle: 'hidden'
+        titleBarStyle: 'hidden',
+        titleBarOverlay: {
+            color: '#444',
+            height: 40,
+            symbolColor: '#ddd'
+        }
     });
 
     // 注入主进程与渲染进程通信函数

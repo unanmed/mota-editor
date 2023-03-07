@@ -1,11 +1,16 @@
 <template>
-    <div id="main"></div>
+    <div id="main">
+        <Titlebar></Titlebar>
+        <Menu></Menu>
+    </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
 import { extractKeyCode } from './editor/utils/keycode/extract';
 import { KeyCode } from './editor/utils/keycode/keyCodes';
+import Menu from './panel/title/menu.vue';
+import Titlebar from './panel/title/titlebar.vue';
 
 onMounted(() => {
     // 开发者工具
