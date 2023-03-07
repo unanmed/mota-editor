@@ -19,7 +19,8 @@ import { Menu, menuDict, menus } from '../../editor/view/menu';
 const toolList = {
     file: '项目',
     edit: '编辑',
-    game: '游戏'
+    game: '游戏',
+    other: '其他'
 };
 
 let showed: boolean = false;

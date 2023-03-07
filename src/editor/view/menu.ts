@@ -273,7 +273,7 @@ export const editMenu = new Menu([
     }
 ]);
 editMenu.setPos(104, 40);
-editMenu.width = 300;
+editMenu.width = 250;
 
 export const gameMenu = new Menu([
     {
@@ -296,15 +296,45 @@ export const gameMenu = new Menu([
         fn: () => {
             console.log(19);
         }
+    },
+    'divider',
+    {
+        text: '打包当前游戏',
+        fn: () => {
+            console.log(21);
+        }
+    },
+    {
+        text: '发布自助更新',
+        fn: () => {
+            console.log(22);
+        }
     }
 ]);
 gameMenu.setPos(160, 40);
 gameMenu.width = 350;
 
+export const otherMenu = new Menu([
+    {
+        text: '打开插件库',
+        fn: () => {
+            console.log(23);
+        }
+    },
+    {
+        text: '打开素材库',
+        fn: () => {
+            console.log(24);
+        }
+    }
+]);
+otherMenu.setPos(216, 40);
+
 export const menuDict = {
     file: fileMenu,
     edit: editMenu,
-    game: gameMenu
+    game: gameMenu,
+    other: otherMenu
 };
 
 export const menus = new MenuController();
