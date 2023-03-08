@@ -9,11 +9,10 @@
                 <Side></Side>
             </div>
             <div id="main-content">
-                <PanelRenderer
+                <EditorView
                     class="main-split"
-                    v-if="splitMain.list.length > 0"
-                    :panel="splitMain"
-                ></PanelRenderer>
+                    v-if="view.list.length > 0"
+                ></EditorView>
                 <Empty v-else></Empty>
             </div>
         </div>
@@ -31,8 +30,8 @@ import Bottom from './panel/main/bottom.vue';
 import Menu from './panel/title/menu.vue';
 import Titlebar from './panel/title/titlebar.vue';
 import Empty from './panel/main/empty.vue';
-import { splitMain } from './editor/view/control';
-import { PanelRenderer } from './editor/view/panel';
+import { view } from './editor/view/control';
+import EditorView from './editor/view/editorView.vue';
 
 let side: HTMLDivElement;
 let bottom: HTMLDivElement;
@@ -77,6 +76,9 @@ onMounted(() => {
 #main-content {
     width: 100%;
     height: 100%;
+    overflow: hidden;
+    background-color: #222;
+    position: relative;
 }
 
 #main-top {
@@ -91,11 +93,5 @@ onMounted(() => {
 
 #main-bottom {
     width: 100%;
-}
-
-.main-split {
-    width: 100%;
-    height: 100%;
-    background-color: #222;
 }
 </style>

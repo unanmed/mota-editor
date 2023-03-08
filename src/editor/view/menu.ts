@@ -3,7 +3,7 @@ import { selectProject } from '../project/open';
 
 interface MenuData {
     text: string;
-    fn: () => void;
+    fn: () => boolean;
     shortcut?: string;
     divide?: boolean;
     child?: Menu;
@@ -151,6 +151,7 @@ export const recentMenu = new Menu([
         shortcut: 'Ctrl + Alt + A',
         fn: () => {
             console.log(7);
+            return true;
         }
     },
     'divider',
@@ -159,6 +160,7 @@ export const recentMenu = new Menu([
             text: v,
             fn: () => {
                 console.log(20);
+                return true;
             }
         };
     })
@@ -171,6 +173,7 @@ export const fileMenu = new Menu([
         shortcut: 'Ctrl + Alt + N',
         fn: () => {
             console.log(1);
+            return true;
         }
     },
     {
@@ -178,6 +181,7 @@ export const fileMenu = new Menu([
         shortcut: 'Ctrl + Shift + N',
         fn: () => {
             console.log(30);
+            return true;
         }
     },
     'divider',
@@ -186,12 +190,14 @@ export const fileMenu = new Menu([
         shortcut: 'Ctrl + O',
         fn: () => {
             selectProject();
+            return true;
         }
     },
     {
         text: '从文件夹打开',
         fn: () => {
             console.log(32);
+            return true;
         }
     },
     {
@@ -199,18 +205,21 @@ export const fileMenu = new Menu([
         shortcut: 'Ctrl + Shift + O',
         fn: () => {
             console.log(28);
+            return true;
         }
     },
     {
         text: '在新窗口打开',
         fn: () => {
             console.log(31);
+            return true;
         }
     },
     {
         text: '打开最近的项目',
         fn: () => {
             console.log(5);
+            return false;
         },
         child: recentMenu
     },
@@ -220,6 +229,7 @@ export const fileMenu = new Menu([
         shortcut: 'Ctrl + S',
         fn: () => {
             console.log(3);
+            return true;
         }
     },
     {
@@ -227,6 +237,7 @@ export const fileMenu = new Menu([
         shortcut: 'Ctrl + Alt + S',
         fn: () => {
             console.log(4);
+            return true;
         }
     },
     'divider',
@@ -235,6 +246,7 @@ export const fileMenu = new Menu([
         shortcut: 'Ctrl + F4',
         fn: () => {
             console.log(6);
+            return true;
         }
     },
     {
@@ -242,6 +254,7 @@ export const fileMenu = new Menu([
         shortcut: 'Ctrl + Alt + F4',
         fn: () => {
             console.log(8);
+            return true;
         }
     },
     {
@@ -249,6 +262,7 @@ export const fileMenu = new Menu([
         shortcut: 'Alt + F4',
         fn: () => {
             console.log(9);
+            return true;
         }
     },
     'divider',
@@ -256,6 +270,7 @@ export const fileMenu = new Menu([
         text: '退出',
         fn: () => {
             console.log(10);
+            return true;
         }
     }
 ]);
@@ -268,6 +283,7 @@ export const editMenu = new Menu([
         shortcut: 'Ctrl + Z',
         fn: () => {
             console.log(11);
+            return true;
         }
     },
     {
@@ -275,6 +291,7 @@ export const editMenu = new Menu([
         shortcut: 'Ctrl + Y',
         fn: () => {
             console.log(12);
+            return true;
         }
     },
     'divider',
@@ -283,6 +300,7 @@ export const editMenu = new Menu([
         shortcut: 'Ctrl + X',
         fn: () => {
             console.log(13);
+            return true;
         }
     },
     {
@@ -290,6 +308,7 @@ export const editMenu = new Menu([
         shortcut: 'Ctrl + C',
         fn: () => {
             console.log(14);
+            return true;
         }
     },
     {
@@ -297,6 +316,7 @@ export const editMenu = new Menu([
         shortcut: 'Ctrl + V',
         fn: () => {
             console.log(15);
+            return true;
         }
     }
 ]);
@@ -309,6 +329,7 @@ export const gameMenu = new Menu([
         shortcut: 'Ctrl + E',
         fn: () => {
             console.log(16);
+            return true;
         }
     },
     {
@@ -316,6 +337,7 @@ export const gameMenu = new Menu([
         shortcut: 'Ctrl + Shift + E',
         fn: () => {
             console.log(18);
+            return true;
         }
     },
     {
@@ -323,6 +345,7 @@ export const gameMenu = new Menu([
         shortcut: 'Ctrl + Alt + E',
         fn: () => {
             console.log(19);
+            return true;
         }
     },
     {
@@ -330,6 +353,7 @@ export const gameMenu = new Menu([
         shortcut: 'Ctrl + Alt + R',
         fn: () => {
             console.log(28);
+            return true;
         }
     },
     'divider',
@@ -337,12 +361,14 @@ export const gameMenu = new Menu([
         text: '打包当前游戏',
         fn: () => {
             console.log(21);
+            return true;
         }
     },
     {
         text: '发布自助更新',
         fn: () => {
             console.log(22);
+            return true;
         }
     }
 ]);
@@ -354,12 +380,14 @@ export const otherMenu = new Menu([
         text: '打开插件库',
         fn: () => {
             console.log(23);
+            return true;
         }
     },
     {
         text: '打开素材库',
         fn: () => {
             console.log(24);
+            return true;
         }
     }
 ]);
@@ -370,12 +398,14 @@ export const helpMenu = new Menu([
         text: '使用说明',
         fn: () => {
             console.log(25);
+            return true;
         }
     },
     {
         text: '获取帮助',
         fn: () => {
             console.log(27);
+            return true;
         }
     },
     'divider',
@@ -383,6 +413,7 @@ export const helpMenu = new Menu([
         text: '检查更新',
         fn: () => {
             console.log(26);
+            return true;
         }
     }
 ]);

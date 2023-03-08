@@ -26,19 +26,7 @@ import {
     UserOutlined,
     SettingOutlined
 } from '@ant-design/icons-vue';
-import { splitMain } from '../../editor/view/control';
-import data from '../../editor/table/data.json';
-
-function addData() {
-    splitMain.add({
-        content: 'table',
-        props: {
-            key: 'data',
-            data
-        },
-        name: '全塔属性'
-    });
-}
+import { addData } from '../view/control';
 </script>
 
 <style lang="less" scoped>

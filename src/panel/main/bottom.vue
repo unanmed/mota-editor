@@ -2,8 +2,13 @@
     <div id="bottombar">
         <div id="left">
             <span>未登录</span>
-            <span>项目：{{ projectInfo.name.value }}</span>
-            <span>{{ projectInfo.title.value }}</span>
+            <span>{{ projectInfo.name.value }}</span>
+            <span v-if="projectInfo.title.value">{{
+                projectInfo.title.value
+            }}</span>
+            <span v-if="projectInfo.version.value">{{
+                projectInfo.version.value
+            }}</span>
         </div>
         <div id="right">
             <bell-outlined />

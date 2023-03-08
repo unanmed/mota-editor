@@ -2,13 +2,13 @@ import { ref } from 'vue';
 import { RightOutlined } from '@ant-design/icons-vue';
 import { Button } from 'ant-design-vue';
 
-interface TableElement {
+export interface TableElement {
     type: 'object' | 'code' | 'text';
 
     [key: string]: string | TableElement;
 }
 
-interface TableProps {
+export interface TableProps {
     keys: string;
     data: TableElement;
     n: number;

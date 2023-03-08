@@ -1,3 +1,4 @@
+import { addData } from '../../panel/view/control';
 import { Project, projectInfo } from './project';
 
 export async function selectProject() {
@@ -8,4 +9,5 @@ export async function selectProject() {
         return;
     }
     projectInfo.project = new Project(pro);
+    addData();
 }

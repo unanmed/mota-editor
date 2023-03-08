@@ -15,7 +15,11 @@
                 class="divider"
                 v-if="typeof one === 'string'"
             ></a-divider>
-            <div class="menu-one" v-else-if="!one.child" @click="one.fn()">
+            <div
+                class="menu-one"
+                v-else-if="!one.child"
+                @click="doClick(one.fn, menu)"
+            >
                 <span>{{ one.text }}</span>
                 <span v-if="one.shortcut">{{ one.shortcut }}</span>
             </div>
@@ -62,6 +66,11 @@ function closeChildMenu(ev: MouseEvent, menu: Menu) {
     showChild.cancel();
     closeChild(ev, menu);
 }
+
+function doClick(fn: () => boolean, menu: Menu) {
+    const close = fn();
+    if (close) menus.remove(menu);
+}
 </script>
 
 <style lang="less" scoped>
@@ -75,7 +84,7 @@ function closeChildMenu(ev: MouseEvent, menu: Menu) {
     background-color: #333;
     max-height: 90vh;
     overflow: auto;
-    z-index: 1;
+    z-index: 20;
 }
 
 .menu-one {
