@@ -1,7 +1,7 @@
 <template>
     <div id="sidebar">
         <div id="top">
-            <unordered-list-outlined class="panel-icon" />
+            <unordered-list-outlined class="panel-icon" @click="addData" />
             <picture-outlined class="panel-icon" />
             <code-outlined class="panel-icon" />
             <file-add-outlined class="panel-icon" />
@@ -26,6 +26,19 @@ import {
     UserOutlined,
     SettingOutlined
 } from '@ant-design/icons-vue';
+import { splitMain } from '../../editor/view/control';
+import data from '../../editor/table/data.json';
+
+function addData() {
+    splitMain.add({
+        content: 'table',
+        props: {
+            key: 'data',
+            data
+        },
+        name: '全塔属性'
+    });
+}
 </script>
 
 <style lang="less" scoped>

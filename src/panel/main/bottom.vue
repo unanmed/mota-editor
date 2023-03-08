@@ -2,7 +2,8 @@
     <div id="bottombar">
         <div id="left">
             <span>未登录</span>
-            <span>项目：未选择</span>
+            <span>项目：{{ projectInfo.name.value }}</span>
+            <span>{{ projectInfo.title.value }}</span>
         </div>
         <div id="right">
             <bell-outlined />
@@ -12,6 +13,7 @@
 
 <script lang="ts" setup>
 import { BellOutlined } from '@ant-design/icons-vue';
+import { projectInfo } from '../../editor/project/project';
 </script>
 
 <style lang="less" scoped>

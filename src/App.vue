@@ -10,6 +10,7 @@
             </div>
             <div id="main-content">
                 <PanelRenderer
+                    class="main-split"
                     v-if="splitMain.list.length > 0"
                     :panel="splitMain"
                 ></PanelRenderer>
@@ -90,5 +91,11 @@ onMounted(() => {
 
 #main-bottom {
     width: 100%;
+}
+
+.main-split {
+    width: 100%;
+    height: 100%;
+    background-color: #222;
 }
 </style>

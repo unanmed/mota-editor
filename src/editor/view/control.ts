@@ -2,8 +2,9 @@ import { Component, ref, shallowReactive } from 'vue';
 import { Splitpanes, Pane, SplitpaneProps, PaneProps } from 'splitpanes';
 
 interface Panel {
-    content: Component;
-    props: Partial<PaneProps>;
+    content: 'table';
+    name: string;
+    props: any;
 }
 
 type EditorPanel = Panel | SplitPanel;

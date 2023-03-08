@@ -75,6 +75,7 @@ function closeChildMenu(ev: MouseEvent, menu: Menu) {
     background-color: #333;
     max-height: 90vh;
     overflow: auto;
+    z-index: 1;
 }
 
 .menu-one {

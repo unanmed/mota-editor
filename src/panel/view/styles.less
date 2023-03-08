@@ -1,0 +1,83 @@
+// ---------- 主要
+.panel-split {
+    width: 100%;
+    height: 100%;
+}
+
+.panel-one {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #888;
+
+    .panel-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 16px;
+        padding: 0 12px;
+        border-bottom: 1px solid #888;
+        background-color: #444;
+    }
+
+    .panel-close {
+        cursor: pointer;
+    }
+
+    .panel-close:hover {
+        color: aqua;
+    }
+}
+
+// ---------- 表格
+.table-root {
+    font-size: 16px;
+    user-select: none;
+    border-bottom: solid 1px #888;
+    padding: 0 0 6px 0;
+}
+
+.table-content {
+    position: relative;
+    left: 12px;
+    border-left: solid 1px #444;
+}
+
+.table-folder {
+    cursor: pointer;
+    border-bottom: 1px solid #888;
+    padding: 8px 4px;
+    display: flex;
+    background-color: #333;
+}
+
+.table-one {
+    padding: 4px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #666;
+
+    .table-key {
+        display: flex;
+        justify-content: center;
+        border-right: 1px solid #666;
+        flex-basis: 25%;
+    }
+
+    .table-text {
+        display: flex;
+        justify-content: center;
+        border-right: 1px solid #666;
+        flex-basis: 50%;
+    }
+
+    .table-edit {
+        display: flex;
+        justify-content: center;
+        flex-basis: 25%;
+    }
+}
+
+.table-fold-key {
+    margin-left: 24px;
+}
