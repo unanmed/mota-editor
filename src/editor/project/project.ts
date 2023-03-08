@@ -1,7 +1,20 @@
-import { MotaProjectData } from '../../../electron/process/editor/project/project';
+import type { MotaProjectData } from '../../../electron/process/editor/project/project';
 
 export class Project {
-    constructor(data: MotaProjectData) {}
+    data: MotaProjectData;
+    /** 全塔属性 */
+    mainData: DataCore;
+
+    constructor(data: MotaProjectData) {
+        this.data = data;
+        const mainData = data.mainInfo[0];
+        this.mainData = JSON.parse(
+            mainData.content
+                .split(/(\n|\r\n)/)
+                .slice(1)
+                .join('')
+        );
+    }
 
     close() {}
 }
