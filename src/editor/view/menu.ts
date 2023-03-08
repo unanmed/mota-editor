@@ -1,4 +1,5 @@
 import { Ref, shallowReactive } from 'vue';
+import { selectProject } from '../project/open';
 
 interface MenuData {
     text: string;
@@ -173,10 +174,37 @@ export const fileMenu = new Menu([
         }
     },
     {
+        text: '新建窗口',
+        shortcut: 'Ctrl + Shift + N',
+        fn: () => {
+            console.log(30);
+        }
+    },
+    'divider',
+    {
         text: '打开项目',
         shortcut: 'Ctrl + O',
         fn: () => {
-            console.log(2);
+            selectProject();
+        }
+    },
+    {
+        text: '从文件夹打开',
+        fn: () => {
+            console.log(32);
+        }
+    },
+    {
+        text: '打开在线工程',
+        shortcut: 'Ctrl + Shift + O',
+        fn: () => {
+            console.log(28);
+        }
+    },
+    {
+        text: '在新窗口打开',
+        fn: () => {
+            console.log(31);
         }
     },
     {
@@ -185,13 +213,6 @@ export const fileMenu = new Menu([
             console.log(5);
         },
         child: recentMenu
-    },
-    {
-        text: '打开在线工程',
-        shortcut: 'Ctrl + Shift + O',
-        fn: () => {
-            console.log(28);
-        }
     },
     'divider',
     {
@@ -302,6 +323,13 @@ export const gameMenu = new Menu([
         shortcut: 'Ctrl + Alt + E',
         fn: () => {
             console.log(19);
+        }
+    },
+    {
+        text: '重新加载当前游戏',
+        shortcut: 'Ctrl + Alt + R',
+        fn: () => {
+            console.log(28);
         }
     },
     'divider',

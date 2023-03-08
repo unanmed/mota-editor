@@ -15,12 +15,12 @@ const createWindow = () => {
             color: '#444',
             height: 40,
             symbolColor: '#ddd'
-        }
+        },
+        darkTheme: true
     });
 
     // 注入主进程与渲染进程通信函数
     injectWithWindow(win);
-    injectCommonModules();
     win.setMenuBarVisibility(false);
 
     if (process.env.VITE_DEV_SERVER_URL) {
@@ -29,6 +29,8 @@ const createWindow = () => {
         win.loadFile('dist/index.html');
     }
 };
+
+injectCommonModules();
 
 app.whenReady().then(() => {
     createWindow();

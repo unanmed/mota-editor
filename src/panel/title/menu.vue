@@ -42,7 +42,7 @@ const showChild = debounce((ev: MouseEvent, menu: Menu) => {
     const ele = ev.target as HTMLElement;
     const rect = ele.getBoundingClientRect();
     const right = rect.right + 6;
-    const top = rect.top - 7;
+    const top = rect.top - 6.5;
     menu.setPos(right, top);
     menu.hover(closeChild.cancel, () => {
         closeChild(ev, menu);

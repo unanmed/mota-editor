@@ -54,6 +54,7 @@ export interface MotaProjectData {
     structure: Structure;
     path: string;
     extensions: FileData[];
+    readonly?: boolean;
 }
 
 export const projectList: MotaProject[] = [];
@@ -213,7 +214,8 @@ export class MotaProject {
             libs,
             structure,
             path: this.dir,
-            extensions
+            extensions,
+            readonly: false
         };
 
         console.log(`open project ${this.name} success.`);
@@ -221,12 +223,13 @@ export class MotaProject {
         const config = first.data!;
         config.recent ??= [];
         if (config.recent.length > 10) {
-            config.recent.shift();
+            config.recent.pop();
         }
         if (config.recent.includes(this.dir)) {
             config.recent = config.recent.filter(v => v !== this.dir);
         }
-        config.recent.push(this.dir);
+        config.recent.unshift(this.dir);
+
         await first.writeToFile();
 
         return project;

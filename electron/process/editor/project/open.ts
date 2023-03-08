@@ -14,7 +14,7 @@ export class ProjectSelector {
                 { name: 'all', extensions: ['*'] }
             ]
         });
-        return await this.openAll(res.filePaths);
+        return await this.open(res.filePaths[0]);
     }
 
     /**
@@ -42,15 +42,24 @@ export class ProjectSelector {
     async selectFromFolder(path: string) {
         return await this.open(resolve(path, 'project.h5proj'));
     }
+
+    /**
+     * 选择项目文件夹
+     */
+    async selectFolder() {
+        const res = await dialog.showOpenDialog({
+            title: '请选择魔塔项目文件夹',
+            properties: ['openDirectory']
+        });
+        return await this.selectFromFolder(res.filePaths[0]);
+    }
 }
 
 export function injectProjectSelector() {
     const selector = new ProjectSelector();
     ipcMain.handle('project.select', () => selector.select());
     ipcMain.handle('project.open', (e, path) => selector.open(path));
-    ipcMain.handle('project.selectFolder', (e, path) =>
-        selector.selectFromFolder(path)
-    );
+    ipcMain.handle('project.selectFolder', e => selector.selectFolder());
     ipcMain.handle('project.close', (e, path) =>
         projectList.find(v => v.dir === path)?.close()
     );

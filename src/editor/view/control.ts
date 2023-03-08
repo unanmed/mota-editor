@@ -1,4 +1,4 @@
-import { Component, shallowReactive } from 'vue';
+import { Component, ref, shallowReactive } from 'vue';
 import { Splitpanes, Pane, SplitpaneProps, PaneProps } from 'splitpanes';
 
 interface Panel {
@@ -31,3 +31,8 @@ export class SplitPanel {
         this.list.splice(index, 1);
     }
 }
+
+export const sidebar = ref(true);
+export const bottombar = ref(true);
+
+export const splitMain = new SplitPanel();
