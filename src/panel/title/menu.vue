@@ -85,6 +85,7 @@ function doClick(fn: () => boolean, menu: Menu) {
     max-height: 90vh;
     overflow: auto;
     z-index: 20;
+    box-shadow: 0px 0px 12px black;
 }
 
 .menu-one {
