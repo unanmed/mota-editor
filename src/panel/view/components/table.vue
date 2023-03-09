@@ -40,10 +40,7 @@ const props = defineProps<{
 
 const opened = ref(true);
 
-const toRender: Record<string, TableElement> = {};
-for (const [key, d] of Object.entries(props.data)) {
-    if (typeof d !== 'string') toRender[key] = d;
-}
+const toRender = props.data.data as Record<string, TableElement>;
 </script>
 
 <style lang="less" scoped></style>

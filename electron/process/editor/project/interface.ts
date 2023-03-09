@@ -5,6 +5,6 @@ export function getRecentFiles() {
     return first.data.recent ?? [];
 }
 
-export function injectPrpjectInterface() {
+export function injectProjectInterface() {
     ipcMain.handle('project.recent', () => getRecentFiles());
 }

@@ -71,6 +71,12 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true
-    }
+    },
+    "extraResources": [
+      {
+        "from": "./src/editor/table",
+        "to": "table"
+      }
+    ]
   }
 }

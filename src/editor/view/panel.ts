@@ -1,5 +1,6 @@
 import { ref, Ref } from 'vue';
 import { TableProps } from '../../panel/view/components/table';
+import { view } from './control';
 
 export type PanelType = 'table';
 
@@ -47,6 +48,19 @@ export class Panel<T extends PanelType = PanelType> {
     setMinSize(width?: number, height?: number) {
         width && (this.minWidth = width);
         height && (this.minHeight = height);
+        return this;
+    }
+
+    focus() {
+        view.list.forEach(v => {
+            v.focused.value = false;
+            if (!v.toped) {
+                v.zIndex.value = 0;
+            }
+        });
+        this.focused.value = true;
+        if (!this.toped) this.zIndex.value = 1;
+        else this.zIndex.value = 10;
         return this;
     }
 }

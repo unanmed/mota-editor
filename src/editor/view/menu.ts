@@ -145,27 +145,31 @@ export class MenuController {
     }
 }
 
-export const recentMenu = new Menu([
-    {
-        text: '打开全部',
-        shortcut: 'Ctrl + Alt + A',
-        fn: () => {
-            console.log(7);
-            return true;
-        }
-    },
-    'divider',
-    ...(await window.editor.project.getRecent()).map(v => {
-        return {
-            text: v,
+export const recentMenu = new Menu();
+recentMenu.width = 300;
+
+(async function () {
+    recentMenu.set([
+        {
+            text: '打开全部',
+            shortcut: 'Ctrl + Alt + A',
             fn: () => {
-                console.log(20);
+                console.log(7);
                 return true;
             }
-        };
-    })
-]);
-recentMenu.width = 300;
+        },
+        'divider',
+        ...(await window.editor.project.getRecent()).map(v => {
+            return {
+                text: v,
+                fn: () => {
+                    console.log(20);
+                    return true;
+                }
+            };
+        })
+    ]);
+})();
 
 export const fileMenu = new Menu([
     {

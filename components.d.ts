@@ -10,7 +10,5 @@ export {}
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     ADivider: typeof import('ant-design-vue/es')['Divider']
-    HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
-    Scroll: typeof import('./src/components/scroll.vue')['default']
   }
 }
