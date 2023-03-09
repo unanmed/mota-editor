@@ -8,7 +8,7 @@
             <div id="main-side">
                 <Side></Side>
             </div>
-            <div id="main-content" @click="blur">
+            <div id="main-content" @mousedown="blur">
                 <EditorView class="main-split"></EditorView>
                 <Empty></Empty>
             </div>

@@ -8,7 +8,7 @@
             height: `${height}px`,
             zIndex: panel.zIndex.value
         }"
-        @click.stop="focus"
+        @mousedown.stop="focus"
     >
         <div
             class="panel-info"
