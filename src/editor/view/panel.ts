@@ -17,6 +17,8 @@ export class Panel<T extends PanelType = PanelType> {
     height!: number;
     maxWidth?: number;
     maxHeight?: number;
+    minWidth: number = 200;
+    minHeight: number = 100;
     toped: boolean = false;
 
     zIndex: Ref<number> = ref(0);
@@ -39,6 +41,12 @@ export class Panel<T extends PanelType = PanelType> {
     setMaxSize(width?: number, height?: number) {
         width && (this.maxWidth = width);
         height && (this.maxHeight = height);
+        return this;
+    }
+
+    setMinSize(width?: number, height?: number) {
+        width && (this.minWidth = width);
+        height && (this.minHeight = height);
         return this;
     }
 }

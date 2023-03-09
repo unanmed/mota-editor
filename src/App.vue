@@ -8,12 +8,9 @@
             <div id="main-side">
                 <Side></Side>
             </div>
-            <div id="main-content">
-                <EditorView
-                    class="main-split"
-                    v-if="view.list.length > 0"
-                ></EditorView>
-                <Empty v-else></Empty>
+            <div id="main-content" @click="blur">
+                <EditorView class="main-split"></EditorView>
+                <Empty></Empty>
             </div>
         </div>
         <div id="main-bottom">
@@ -35,6 +32,12 @@ import EditorView from './editor/view/editorView.vue';
 
 let side: HTMLDivElement;
 let bottom: HTMLDivElement;
+
+function blur() {
+    view.list.forEach(v => {
+        v.focused.value = false;
+    });
+}
 
 onMounted(() => {
     side = document.getElementById('main-side') as HTMLDivElement;

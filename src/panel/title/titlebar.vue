@@ -37,11 +37,15 @@ function select(key: keyof typeof toolList) {
 }
 
 onMounted(() => {
-    document.addEventListener('click', () => {
-        menus.clear();
-        showed = false;
-        now = null;
-    });
+    document.addEventListener(
+        'click',
+        () => {
+            menus.clear();
+            showed = false;
+            now = null;
+        },
+        { capture: true }
+    );
 });
 </script>
 

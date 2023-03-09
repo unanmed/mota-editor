@@ -8,7 +8,7 @@
             height: `${height}px`,
             zIndex: panel.zIndex.value
         }"
-        @click="focus"
+        @click.stop="focus"
     >
         <div
             class="panel-info"
@@ -41,6 +41,26 @@
         <div class="panel-content" :style="{ borderColor }" v-if="!mined">
             <Panel :name="name" :type="type" :props="p"></Panel>
         </div>
+        <div
+            v-if="!mined"
+            class="border-left border"
+            @mousedown="beginResize($event, 'left')"
+        ></div>
+        <div
+            v-if="!mined"
+            class="border-right border"
+            @mousedown="beginResize($event, 'right')"
+        ></div>
+        <div
+            v-if="!mined"
+            class="border-top border"
+            @mousedown="beginResize($event, 'top')"
+        ></div>
+        <div
+            v-if="!mined"
+            class="border-bottom border"
+            @mousedown="beginResize($event, 'bottom')"
+        ></div>
     </div>
 </template>
 
@@ -54,7 +74,7 @@ import {
     DownloadOutlined
 } from '@ant-design/icons-vue';
 import { Panel } from './view';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { content, view } from './control';
 
 const maxed = ref(false);
@@ -78,12 +98,16 @@ height.value = props.panel.height;
 
 const maxWidth = props.panel.maxWidth || Infinity;
 const maxHeight = props.panel.maxHeight || Infinity;
+const { minWidth, minHeight } = props.panel;
 
 const borderColor = computed(() => {
     return props.panel.focused.value ? '#fff' : '#888';
 });
 
 let moved = false;
+
+let winWidth = content.clientWidth;
+let winHeight = content.clientHeight;
 
 /**
  * 聚焦到这个窗口
@@ -145,15 +169,15 @@ let beforeHeight_min = 0;
  */
 function minSize() {
     if (moved) return;
-    maxed.value = false;
     if (!mined.value) {
-        beforeHeight_min = height.value;
+        beforeHeight_min = maxed.value ? beforeHeight : height.value;
         height.value = 28;
         mined.value = true;
     } else {
         height.value = beforeHeight_min;
-        mined.value = !mined.value;
+        mined.value = false;
     }
+    maxed.value = false;
 }
 
 /**
@@ -203,6 +227,10 @@ function beginDrag(e: MouseEvent) {
  * 拖拽
  */
 function drag(e: MouseEvent) {
+    dragLeft(e);
+    dragRight(e);
+    dragTop(e);
+    dragBottom(e);
     if (!dragging) return;
     const { clientX, clientY } = e;
     const { clientWidth, clientHeight } = content;
@@ -220,14 +248,150 @@ function drag(e: MouseEvent) {
     top.value = toY;
 }
 
-onMounted(() => {
-    document.addEventListener('mouseup', () => {
-        setTimeout(() => {
-            dragging = false;
-            moved = false;
-        });
+function mouseup() {
+    setTimeout(() => {
+        dragging = false;
+        moved = false;
+        leftDrag = false;
+        rightDrag = false;
+        bottomDrag = false;
+        topDrag = false;
     });
+}
+
+// 边框
+let leftDrag = false;
+let rightDrag = false;
+let topDrag = false;
+let bottomDrag = false;
+let leftBefore = 0;
+let topBefore = 0;
+let beforeWidth_b = 0;
+let beforeHeight_b = 0;
+
+function beginResize(e: MouseEvent, type: string) {
+    const { clientX, clientY } = e;
+    startX = clientX;
+    startY = clientY;
+    if (type === 'left') {
+        leftBefore = left.value;
+        leftDrag = true;
+        beforeWidth_b = width.value;
+    } else if (type === 'top') {
+        topBefore = top.value;
+        topDrag = true;
+        beforeHeight_b = height.value;
+    } else if (type === 'bottom') {
+        bottomDrag = true;
+        beforeHeight_b = height.value;
+    } else {
+        rightDrag = true;
+        beforeWidth_b = width.value;
+    }
+}
+
+function dragLeft(e: MouseEvent) {
+    if (!leftDrag) return;
+    const { clientX, clientY } = e;
+    const { clientWidth, clientHeight } = content;
+    const dx = clientX - startX;
+
+    let toX = dx + leftBefore;
+    let toWidth = beforeWidth_b - dx;
+
+    if (toWidth < minWidth) {
+        toWidth = minWidth;
+        toX = leftBefore + beforeWidth_b - minWidth;
+    }
+    if (toX > clientWidth - 40) {
+        toX = clientWidth - 40;
+        toWidth = beforeWidth_b - toX + leftBefore;
+    }
+    if (toWidth > maxWidth) {
+        toWidth = maxWidth;
+        toX = leftBefore + beforeWidth_b - maxWidth;
+    }
+    left.value = toX;
+    width.value = toWidth;
+}
+
+function dragRight(e: MouseEvent) {
+    if (!rightDrag) return;
+    const { clientX, clientY } = e;
+    const dx = clientX - startX;
+
+    let toWidth = beforeWidth_b + dx;
+    if (toWidth < minWidth) toWidth = minWidth;
+    if (toWidth > maxWidth) toWidth = maxWidth;
+    if (left.value + toWidth < 40) toWidth = 40 - left.value;
+
+    width.value = toWidth;
+}
+
+function dragTop(e: MouseEvent) {
+    if (!topDrag) return;
+    const { clientX, clientY } = e;
+    const { clientWidth, clientHeight } = content;
+    const dy = clientY - startY;
+
+    let toY = dy + topBefore;
+    let toHeight = beforeHeight_b - dy;
+
+    if (toHeight < minHeight) {
+        toHeight = minHeight;
+        toY = topBefore + beforeHeight_b - minHeight;
+    }
+    if (toY > clientHeight - 28) {
+        toY = clientHeight - 28;
+        toHeight = beforeHeight_b - toY + topBefore;
+    }
+    if (toY < 0) {
+        toY = 0;
+        toHeight = beforeHeight_b + topBefore;
+    }
+    if (toHeight > maxHeight) {
+        toHeight = maxHeight;
+        toY = topBefore + beforeWidth_b - maxHeight;
+    }
+    top.value = toY;
+    height.value = toHeight;
+}
+
+function dragBottom(e: MouseEvent) {
+    if (!bottomDrag) return;
+    const { clientX, clientY } = e;
+    const dy = clientY - startY;
+
+    let toHeight = beforeHeight_b + dy;
+    if (toHeight < minHeight) toHeight = minHeight;
+    if (toHeight > maxHeight) toHeight = maxHeight;
+    if (top.value + toHeight < 40) toHeight = 40 - top.value;
+
+    height.value = toHeight;
+}
+
+function relocate(e: UIEvent) {
+    requestAnimationFrame(() => {
+        const { clientWidth, clientHeight } = content;
+        const ratioX = clientWidth / winWidth;
+        const ratioY = clientHeight / winHeight;
+        winWidth = clientWidth;
+        winHeight = clientHeight;
+        left.value *= ratioX;
+        top.value *= ratioY;
+    });
+}
+
+onMounted(() => {
+    document.addEventListener('mouseup', mouseup);
     document.addEventListener('mousemove', drag);
+    window.addEventListener('resize', relocate);
+});
+
+onUnmounted(() => {
+    document.removeEventListener('mousemove', drag);
+    document.removeEventListener('mouseup', mouseup);
+    window.removeEventListener('resize', relocate);
 });
 </script>
 
@@ -294,5 +458,51 @@ onMounted(() => {
 
 .panel-top {
     transform: rotate(180deg);
+}
+
+// 边框
+
+.border {
+    position: absolute;
+}
+
+.border-left {
+    width: 0;
+    height: 100%;
+    border-left: 10px solid transparent;
+    left: 0;
+    top: 0;
+    cursor: ew-resize;
+    transform: translateX(-5px);
+}
+
+.border-right {
+    width: 0;
+    height: 100%;
+    border-right: 10px solid transparent;
+    right: 0;
+    top: 0;
+    cursor: ew-resize;
+    transform: translateX(5px);
+}
+
+.border-top {
+    width: 100%;
+    height: 0;
+    border-top: 10px solid transparent;
+    left: 0;
+    top: 0;
+    cursor: ns-resize;
+    transform: translateY(-5px);
+}
+
+.border-bottom {
+    width: 100%;
+    height: 0;
+    border-bottom: 10px solid transparent;
+    left: 0;
+    bottom: 0;
+    cursor: ns-resize;
+    transform: translateY(5px);
 }
 </style>
