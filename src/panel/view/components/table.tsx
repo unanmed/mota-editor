@@ -1,5 +1,3 @@
-import { ref } from 'vue';
-import { RightOutlined } from '@ant-design/icons-vue';
 import { Button } from 'ant-design-vue';
 import Table from './table.vue';
 

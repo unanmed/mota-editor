@@ -14,6 +14,6 @@ export function addData() {
             n: 0
         })
             .setDefaultSize(500, 500)
-            .setMaxSize(500)
+            .setMaxSize(750)
     );
 }

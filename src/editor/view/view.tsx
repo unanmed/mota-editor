@@ -14,7 +14,7 @@ export function Panel<T extends PanelType>(props: PanelViewProps<T>) {
     if (type === 'table') {
         return (
             <TableRenderer
-                style="overflow-x: hidden; overflow-y: auto; max-width: 500px"
+                style="overflow-x: hidden; overflow-y: auto"
                 keys={p.keys ?? 'default'}
                 data={p.data}
                 n={0}
