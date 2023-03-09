@@ -17,7 +17,7 @@ export class PanelController {
      * @param panel 面板
      */
     remove(panel: Panel) {
-        const index = this.list.indexOf(panel);
+        const index = this.list.findIndex(v => v.num === panel.num);
         if (index === -1) return;
         this.list.splice(index, 1);
     }

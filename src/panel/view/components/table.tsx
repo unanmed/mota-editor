@@ -33,7 +33,11 @@ export function TableRenderer(props: TableProps) {
                 <div
                     class={'table-folder'}
                     onClick={() => (opened.value = !opened.value)}
-                    style={{ maxWidth: `${500 - 12 * props.n}px` }}
+                    style={{
+                        backgroundColor: `#${(3 + props.n)
+                            .toString()
+                            .repeat(3)}`
+                    }}
                 >
                     <RightOutlined
                         class={'table-fold-icon'}
@@ -61,10 +65,7 @@ export function TableRenderer(props: TableProps) {
         );
     } else {
         return (
-            <div
-                class={'table-one'}
-                style={{ maxWidth: `${500 - 12 * props.n}px` }}
-            >
+            <div class={'table-one'}>
                 <span class={'table-key'}>{props.keys}</span>
                 <span class={'table-text'}>{data.text ?? ''}</span>
                 <span class={'table-edit'}>

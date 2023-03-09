@@ -6,6 +6,7 @@
         :p="panel.props"
         :name="panel.name"
         :panel="panel"
+        :key="panel.num"
     ></PanelView>
 </template>
 

@@ -3,10 +3,9 @@
         class="panel-one"
         :style="{
             left: `${left}px`,
-            width: `${right - left}px`,
+            width: `${width}px`,
             top: `${top}px`,
-            height: `${bottom - top}px`,
-            borderColor,
+            height: `${height}px`,
             zIndex: panel.zIndex.value
         }"
         @click="focus"
@@ -14,8 +13,9 @@
         <div
             class="panel-info"
             :style="{
-                borderBottom: mined ? 'none' : `1px solid ${borderColor}`
+                borderColor
             }"
+            @mousedown="beginDrag"
         >
             <span>{{ name }}</span>
             <div class="panel-tools">
@@ -38,7 +38,9 @@
                 <CloseOutlined class="panel-close panel-tool" @click="close" />
             </div>
         </div>
-        <Panel v-if="!mined" :name="name" :type="type" :props="p"></Panel>
+        <div class="panel-content" :style="{ borderColor }" v-if="!mined">
+            <Panel :name="name" :type="type" :props="p"></Panel>
+        </div>
     </div>
 </template>
 
@@ -52,7 +54,7 @@ import {
     DownloadOutlined
 } from '@ant-design/icons-vue';
 import { Panel } from './view';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { content, view } from './control';
 
 const maxed = ref(false);
@@ -60,9 +62,9 @@ const mined = ref(false);
 const toped = ref(false);
 
 const left = ref<number>(0);
-const right = ref<number>(0);
+const width = ref<number>(0);
 const top = ref<number>(0);
-const bottom = ref<number>(0);
+const height = ref<number>(0);
 
 const props = defineProps<{
     name: string;
@@ -71,8 +73,8 @@ const props = defineProps<{
     panel: P<PanelType>;
 }>();
 
-right.value = props.panel.width;
-bottom.value = props.panel.height;
+width.value = props.panel.width;
+height.value = props.panel.height;
 
 const maxWidth = props.panel.maxWidth || Infinity;
 const maxHeight = props.panel.maxHeight || Infinity;
@@ -81,6 +83,11 @@ const borderColor = computed(() => {
     return props.panel.focused.value ? '#fff' : '#888';
 });
 
+let moved = false;
+
+/**
+ * 聚焦到这个窗口
+ */
 function focus() {
     view.list.forEach(v => {
         v.focused.value = false;
@@ -91,57 +98,77 @@ function focus() {
     props.panel.zIndex.value = 1;
 }
 
-let beforeWidth = right.value;
-let beforeHeight = bottom.value;
+let beforeWidth = width.value;
+let beforeHeight = height.value;
 let beforeX = left.value;
 let beforeY = top.value;
 
+/**
+ * 最大化
+ */
 function maxSize() {
+    if (moved) return;
     const { clientWidth, clientHeight } = content;
     const toWidth = clientWidth > maxWidth ? maxWidth : clientWidth - 2;
     const toHeight = clientHeight > maxHeight ? maxHeight : clientHeight;
-    const toX = left.value + toWidth > clientWidth ? clientWidth : left.value;
-    const toY = top.value + toHeight > clientHeight ? clientHeight : top.value;
-    beforeWidth = right.value - left.value;
-    beforeHeight = mined.value ? beforeHeight_min : bottom.value - top.value;
+    const toX = left.value + toWidth > clientWidth ? 0 : left.value;
+    const toY = top.value + toHeight > clientHeight ? 0 : top.value;
+    beforeWidth = width.value;
+    beforeHeight = mined.value ? beforeHeight_min : height.value;
     beforeX = left.value;
     beforeY = top.value;
     left.value = toX;
     top.value = toY;
-    right.value = toWidth;
-    bottom.value = toHeight;
+    width.value = toWidth;
+    height.value = toHeight;
     maxed.value = true;
     mined.value = false;
 }
 
+/**
+ * 取消最大化
+ */
 function unmaxSize() {
+    if (moved) return;
     left.value = beforeX;
     top.value = beforeY;
-    right.value = beforeX + beforeWidth;
-    bottom.value = beforeY + beforeHeight;
+    width.value = beforeWidth;
+    height.value = beforeHeight;
     maxed.value = false;
     mined.value = false;
 }
 
 let beforeHeight_min = 0;
 
+/**
+ * 最小化
+ */
 function minSize() {
+    if (moved) return;
     maxed.value = false;
     if (!mined.value) {
-        beforeHeight_min = bottom.value - top.value;
-        bottom.value = top.value + 28;
+        beforeHeight_min = height.value;
+        height.value = 28;
         mined.value = true;
     } else {
-        bottom.value = top.value + beforeHeight_min;
+        height.value = beforeHeight_min;
         mined.value = !mined.value;
     }
 }
 
+/**
+ * 关闭
+ */
 function close() {
+    if (moved) return;
     view.remove(props.panel);
 }
 
+/**
+ * 置顶
+ */
 function toTop() {
+    if (moved) return;
     if (!toped.value) {
         toped.value = true;
         props.panel.toped = true;
@@ -152,6 +179,56 @@ function toTop() {
         props.panel.zIndex.value = 1;
     }
 }
+
+let dragging = false;
+let startX = 0;
+let startY = 0;
+let winX = 0;
+let winY = 0;
+
+/**
+ * 准备拖拽
+ */
+function beginDrag(e: MouseEvent) {
+    if (dragging) return;
+    dragging = true;
+    const { clientX, clientY } = e;
+    startX = clientX;
+    startY = clientY;
+    winX = left.value;
+    winY = top.value;
+}
+
+/**
+ * 拖拽
+ */
+function drag(e: MouseEvent) {
+    if (!dragging) return;
+    const { clientX, clientY } = e;
+    const { clientWidth, clientHeight } = content;
+    const dx = clientX - startX;
+    const dy = clientY - startY;
+    if (Math.abs(dx) > 10 || Math.abs(dy) > 10) moved = true;
+
+    let toX = dx + winX;
+    let toY = dy + winY;
+    if (toX > clientWidth - 40) toX = clientWidth - 40;
+    else if (toX + width.value < 40) toX = 40 - width.value;
+    if (toY < 0) toY = 0;
+    else if (toY > clientHeight - 28) toY = clientHeight - 28;
+    left.value = toX;
+    top.value = toY;
+}
+
+onMounted(() => {
+    document.addEventListener('mouseup', () => {
+        setTimeout(() => {
+            dragging = false;
+            moved = false;
+        });
+    });
+    document.addEventListener('mousemove', drag);
+});
 </script>
 
 <style lang="less" scoped>
@@ -159,7 +236,7 @@ function toTop() {
     user-select: none;
     display: flex;
     flex-direction: column;
-    border: 1px solid #888;
+    background-color: #222;
 
     .panel-info {
         display: flex;
@@ -169,6 +246,7 @@ function toTop() {
         padding: 0 8px 0 12px;
         background-color: #444;
         height: 28px;
+        border: 1px solid #888;
     }
 
     .panel-close {
@@ -177,6 +255,15 @@ function toTop() {
 
     .panel-close:hover {
         color: aqua;
+    }
+
+    .panel-content {
+        width: 100%;
+        height: calc(100% - 28px);
+        border-bottom: 1px solid;
+        border-left: 1px solid;
+        border-right: 1px solid;
+        overflow: auto;
     }
 }
 
@@ -197,9 +284,12 @@ function toTop() {
     cursor: pointer;
 }
 
-.panel-tool:hover,
-.panel-tool[actived='true'] {
+.panel-tool:hover {
     color: aqua;
+}
+
+.panel-tool[actived='true'] {
+    color: rgb(0, 183, 255);
 }
 
 .panel-top {

@@ -8,6 +8,8 @@ export interface PanelProps {
 }
 
 export class Panel<T extends PanelType = PanelType> {
+    private static num = 0;
+
     type: PanelType;
     name: string;
     props: PanelProps[T];
@@ -19,6 +21,8 @@ export class Panel<T extends PanelType = PanelType> {
 
     zIndex: Ref<number> = ref(0);
     focused: Ref<boolean> = ref(false);
+
+    readonly num: number = Panel.num++;
 
     constructor(type: PanelType, name: string, props: PanelProps[T]) {
         this.type = type;
