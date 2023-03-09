@@ -427,7 +427,26 @@ onUnmounted(() => {
         border-bottom: 1px solid;
         border-left: 1px solid;
         border-right: 1px solid;
-        overflow: auto;
+        overflow: hidden scroll;
+    }
+
+    .panel-content::-webkit-scrollbar {
+        background-color: #222;
+        border-left: 1px solid #bbb;
+        width: 16px;
+    }
+
+    .panel-content::-webkit-scrollbar-thumb {
+        border-left: 1px solid #bbb;
+        background-color: #666;
+    }
+
+    .panel-content::-webkit-scrollbar-thumb:hover {
+        background-color: #888;
+    }
+
+    .panel-content::-webkit-scrollbar-thumb:active {
+        background-color: #777;
     }
 }
 
@@ -483,7 +502,7 @@ onUnmounted(() => {
     right: 0;
     top: 0;
     cursor: ew-resize;
-    transform: translateX(5px);
+    transform: translateX(10px);
 }
 
 .border-top {

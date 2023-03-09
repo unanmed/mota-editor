@@ -4,7 +4,7 @@ import Table from './table.vue';
 export interface TableElement {
     type: 'object' | 'code' | 'text';
 
-    [key: string]: string | TableElement;
+    [key: string]: any;
 }
 
 export interface TableProps {

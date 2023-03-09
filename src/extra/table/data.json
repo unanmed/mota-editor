@@ -9,12 +9,139 @@
                 "floorIds": {
                     "type": "code",
                     "text": "楼层列表",
-                    "doc": "在这里按顺序放所有的楼层；其顺序直接影响到楼层传送器、浏览地图和上/下楼器的顺序"
+                    "doc": [
+                        "在这里按顺序放所有的楼层；其顺序直接影响到楼层传送器、浏览地图和上/下楼器的顺序"
+                    ]
                 },
                 "floorPartitions": {
                     "type": "event",
+                    "event": "floorPartitions",
                     "text": "分区指定",
-                    "doc": "可以在这里指定楼层分区；主要适用于不可返回的高层塔；进入新分区后将自动调用砍层插件以减少空间消耗；未在任何分区的楼层将被视为公共区域/下楼器的顺序"
+                    "doc": [
+                        "可以在这里指定楼层分区；主要适用于不可返回的高层塔；",
+                        "进入新分区后将自动调用砍层插件以减少空间消耗；未在任何分区的楼层将被视为公共区域/下楼器的顺序"
+                    ]
+                },
+                "images": {
+                    "type": "multi_file",
+                    "text": "使用图片",
+                    "doc": [
+                        "在此存放所有可能使用的图片（tilesets除外）。图片可以被作为背景图（的一部分），",
+                        "也可以直接用自定义事件进行显示。 图片名不能使用中文，不能带空格或特殊字符；",
+                        "可以直接改名拼音就好。建议对于较大的图片，",
+                        "在网上使用在线的“图片压缩工具(http://compresspng.com/zh/)”来进行压缩，以节省流量"
+                    ],
+                    "suffix": [
+                        "jpg",
+                        "png",
+                        "jpeg",
+                        "gif"
+                    ],
+                    "path": "project/images/"
+                },
+                "titlesets": {
+                    "type": "multi_file",
+                    "text": "额外素材",
+                    "doc": [
+                        "在此存放额外素材的图片名, \n可以自定导入任意张素材图片，无需PS，无需注册，即可直接在游戏中使用。",
+                        "形式如[\"1.png\", \"2.png\"] ,将需要的素材图片放在images目录下。素材的宽高必须都是32的倍数，",
+                        "且图片上的总图块数不超过10000（即最多有10000个32*32的图块在该图片上）"
+                    ],
+                    "suffix": [
+                        "png"
+                    ],
+                    "path": "project/tilesets/"
+                },
+                "animates": {
+                    "type": "multi_file",
+                    "text": "使用动画",
+                    "doc": [
+                        "在此存放所有可能使用的动画，必须是animate格式，在这里不写后缀名。动画必须放在animates目录下；",
+                        "文件名不能使用中文，不能带空格或特殊字符。\"jianji\", \"thunder\"根据需求自行添加"
+                    ],
+                    "suffix": [
+                        "animate.hide()"
+                    ],
+                    "path": "project/animates/"
+                },
+                "bgms": {
+                    "type": "multi_file",
+                    "text": "使用音乐",
+                    "doc": [
+                        "在此存放所有的bgm，和文件名一致。音频名不能使用中文，不能带空格或特殊字符；可以直接改名拼音就好"
+                    ],
+                    "suffix": [
+                        "mp3",
+                        "ogg.warn('IOS或MAC上无法播放!')",
+                        "wav",
+                        "flac"
+                    ],
+                    "path": "project/bgms/"
+                },
+                "sounds": {
+                    "type": "multi_file",
+                    "text": "使用音乐",
+                    "doc": [
+                        "在此存放所有的SE，和文件名一致。音频名不能使用中文，不能带空格或特殊字符；可以直接改名拼音就好"
+                    ],
+                    "suffix": [
+                        "mp3",
+                        "ogg.warn('IOS或MAC上无法播放!')",
+                        "wav",
+                        "flac"
+                    ],
+                    "path": "project/sounds/"
+                },
+                "fonts": {
+                    "type": "multi_file",
+                    "text": "使用字体",
+                    "doc": [
+                        "在此存放所有可能使用的字体。字体名不能使用中文，不能带空格或特殊字符"
+                    ],
+                    "suffix": [
+                        "ttf",
+                        "oft"
+                    ],
+                    "path": "project/fonts/"
+                },
+                "nameMap": {
+                    "type": "event",
+                    "event": "nameMap",
+                    "text": "文件别名",
+                    "doc": [
+                        "文件别名设置，目前仅对images, animates, bgms, sounds有效"
+                    ]
+                },
+                "levelChoose": {
+                    "type": "event",
+                    "event": "levelChoose",
+                    "text": "难度分歧",
+                    "doc": [
+                        "难度分歧定义和对应的事件；此处留空数组表示将直接开始游戏"
+                    ]
+                },
+                "equipName": {
+                    "type": "code",
+                    "text": "装备孔",
+                    "doc": [
+                        "装备位名称，为一个数组，此项的顺序与equiptype数值关联；例如可写[\"武器\",\"防具\",\"首饰\"]等等。"
+                    ]
+                },
+                "startBgm": {
+                    "type": "select",
+                    "target": "this.main.bgms",
+                    "text": "标题音乐",
+                    "doc": [
+                        "在标题界面应该播放的bgm内容"
+                    ]
+                },
+                "styles": {
+                    "type": "event",
+                    "event": "styles",
+                    "text": "主样式",
+                    "doc": [
+                        "主要样式设置，包括标题、按钮、状态栏等的背景色等"
+                    ]
                 }
             }
         },
@@ -25,7 +152,9 @@
                 "title": {
                     "type": "text",
                     "text": "游戏名",
-                    "doc": "游戏名，将显示在标题页面以及切换楼层的界面中"
+                    "doc": [
+                        "游戏名，将显示在标题页面以及切换楼层的界面中"
+                    ]
                 }
             }
         }
