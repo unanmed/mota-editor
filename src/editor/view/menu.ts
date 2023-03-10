@@ -419,6 +419,14 @@ export const helpMenu = new Menu([
             console.log(26);
             return true;
         }
+    },
+    'divider',
+    {
+        text: '开发者工具',
+        fn: () => {
+            window.dev.open();
+            return true;
+        }
     }
 ]);
 helpMenu.setPos(272, 40);

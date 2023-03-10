@@ -1,3 +1,4 @@
+import { FileHandler } from './file';
 import { ProjectHandler } from './project';
 
 declare global {
@@ -5,6 +6,7 @@ declare global {
         editor: {
             project: ProjectHandler;
             extra: ExtraHandler;
+            file: FileHandler;
         };
     }
 }

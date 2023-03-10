@@ -1,11 +1,13 @@
 import { ref, Ref } from 'vue';
-import { TableProps } from '../../panel/view/components/table';
+import { CodeProps } from '../../panel/view/components/code/code';
+import { TableProps } from '../../panel/view/components/table/table';
 import { view } from './control';
 
-export type PanelType = 'table';
+export type PanelType = 'table' | 'code';
 
 export interface PanelProps {
     table: TableProps;
+    code: CodeProps;
 }
 
 export class Panel<T extends PanelType = PanelType> {
@@ -27,7 +29,7 @@ export class Panel<T extends PanelType = PanelType> {
 
     readonly num: number = Panel.num++;
 
-    constructor(type: PanelType, name: string, props: PanelProps[T]) {
+    constructor(type: T, name: string, props: PanelProps[T]) {
         this.type = type;
         this.name = name;
         this.props = props;
@@ -62,5 +64,11 @@ export class Panel<T extends PanelType = PanelType> {
         if (!this.toped) this.zIndex.value = 1;
         else this.zIndex.value = 10;
         return this;
+    }
+
+    close() {
+        if (this.type === 'code') {
+            (this.props as CodeProps).close();
+        }
     }
 }

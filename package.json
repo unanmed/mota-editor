@@ -74,8 +74,8 @@
     },
     "extraResources": [
       {
-        "from": "./src/editor/table",
-        "to": "table"
+        "from": "./public/",
+        "to": "assets"
       }
     ]
   }

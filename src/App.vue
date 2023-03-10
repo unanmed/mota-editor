@@ -9,7 +9,7 @@
                 <Side></Side>
             </div>
             <div id="main-content" @mousedown="blur">
-                <EditorView class="main-split"></EditorView>
+                <EditorView></EditorView>
                 <Empty></Empty>
             </div>
         </div>

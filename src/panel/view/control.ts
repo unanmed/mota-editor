@@ -1,8 +1,8 @@
 import { view } from '../../editor/view/control';
-import data from '../../editor/table/data.json';
 import { projectInfo } from '../../editor/project/project';
 import { Panel } from '../../editor/view/panel';
-import { TableElement } from './components/table';
+import { TableElement } from './components/table/table';
+import { CodeProps } from './components/code/code';
 
 const tables: Record<string, TableElement> = {};
 
@@ -26,4 +26,12 @@ export function addData() {
             .setMaxSize(750)
             .focus()
     );
+}
+
+export function addCode() {
+    if (!projectInfo.project) return alert('请先打开一个魔塔项目');
+    const code = new CodeProps();
+    const panel = new Panel('code', '代码编辑器', code);
+    view.add(panel.setMinSize(400).setDefaultSize(800, 500).focus());
+    return code;
 }

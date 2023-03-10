@@ -1,6 +1,7 @@
 <template>
     <div
         class="panel-one"
+        :id="`panel-one-${panel.num}`"
         :style="{
             left: `${left}px`,
             width: `${width}px`,
@@ -38,8 +39,17 @@
                 <CloseOutlined class="panel-close panel-tool" @click="close" />
             </div>
         </div>
-        <div class="panel-content" :style="{ borderColor }" v-if="!mined">
-            <Panel :name="name" :type="type" :props="p"></Panel>
+        <div
+            class="panel-content unique-scroll"
+            :style="{ borderColor }"
+            v-if="!mined"
+        >
+            <Panel
+                :name="name"
+                :type="type"
+                :props="p"
+                :num="panel.num"
+            ></Panel>
         </div>
         <div
             v-if="!mined"
@@ -95,6 +105,10 @@ const props = defineProps<{
 
 width.value = props.panel.width;
 height.value = props.panel.height;
+if (content.clientWidth < width.value - 2)
+    width.value = content.clientWidth - 2;
+if (content.clientHeight < height.value - 2)
+    height.value = content.clientHeight - 2;
 
 const maxWidth = props.panel.maxWidth || Infinity;
 const maxHeight = props.panel.maxHeight || Infinity;
@@ -186,6 +200,7 @@ function minSize() {
 function close() {
     if (moved) return;
     view.remove(props.panel);
+    props.panel.close();
 }
 
 /**
@@ -427,26 +442,7 @@ onUnmounted(() => {
         border-bottom: 1px solid;
         border-left: 1px solid;
         border-right: 1px solid;
-        overflow: hidden scroll;
-    }
-
-    .panel-content::-webkit-scrollbar {
-        background-color: #222;
-        border-left: 1px solid #bbb;
-        width: 16px;
-    }
-
-    .panel-content::-webkit-scrollbar-thumb {
-        border-left: 1px solid #bbb;
-        background-color: #666;
-    }
-
-    .panel-content::-webkit-scrollbar-thumb:hover {
-        background-color: #888;
-    }
-
-    .panel-content::-webkit-scrollbar-thumb:active {
-        background-color: #777;
+        overflow: hidden auto;
     }
 }
 
