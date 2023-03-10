@@ -67,6 +67,7 @@ const leftMax = 300;
 const leftMin = 100;
 
 const show = computed(() => props.code.fileList.length > 0);
+const file = computed(() => props.code.fileList[selected.value]);
 
 function changeFile(index: number) {
     const file = props.code.fileList[index];
@@ -123,6 +124,20 @@ async function create() {
 
     editor.focus();
     editor.setModel(props.code.fileList[selected.value]?.model);
+
+    listen();
+}
+
+function listen() {
+    editor.onDidChangeModelContent(e => {
+        file.value.saved.value = false;
+    });
+
+    editor.onKeyUp(e => {
+        if (e.ctrlKey && e.keyCode === monaco.KeyCode.KeyS) {
+            file.value.save();
+        }
+    });
 }
 
 /**
