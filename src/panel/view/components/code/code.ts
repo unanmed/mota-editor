@@ -2,7 +2,7 @@ import { Ref, ref, shallowReactive } from 'vue';
 import * as monaco from 'monaco-editor';
 import { Panel } from '../../../../editor/view/panel';
 
-type CodeFormat = 'javascript' | 'txt';
+type CodeFormat = 'javascript' | 'text';
 
 const fileMap = new Map<string, CodeFile>();
 
@@ -36,14 +36,8 @@ export class CodeController {
 
             if (index === -1) {
                 const f = fileMap.get(uri.path);
-                const file =
-                    f ??
-                    createCodeFile(
-                        path.split(/(\/|\\)/).at(-1)!,
-                        content,
-                        type,
-                        uri
-                    );
+                const name = path.split(/(\/|\\)/).at(-1)!;
+                const file = f ?? createCodeFile(name, content, type, uri);
                 this.select(this.fileList.push(file) - 1);
             } else {
                 this.select(index);
@@ -61,8 +55,9 @@ export class CodeController {
         }
     }
 
-    remove(index: number) {
+    remove(index: number, view?: monaco.editor.ICodeEditorViewState | null) {
         const file = this.fileList[index];
+        if (view) file.view = view;
         this.fileList.splice(index, 1);
         this.selectStack = this.selectStack.filter(v => v !== file.uri.path);
         if (this.selected.value === index) {
@@ -87,7 +82,7 @@ export class CodeController {
 
     select(index: number, view?: monaco.editor.ICodeEditorViewState | null) {
         const file = this.fileList[index];
-        if (view) file.view = view;
+        if (view) this.fileList[this.selected.value].view = view;
         this.selectStack.push(file.uri.path);
         if (this.selectStack.length > 50) this.selectStack.shift();
         this.selected.value = index;
@@ -131,8 +126,8 @@ export class CodeFile {
 
     save() {
         let success = true;
-        this.listen.type?.forEach(v => {
-            if (!v(this.content)) success = false;
+        this.listen.save?.forEach(v => {
+            if (!v(this.model.getValue())) success = false;
         });
         if (success) this.saved.value = true;
     }
@@ -150,7 +145,7 @@ export function createCodeFile(
     uri: monaco.Uri
 ) {
     const f = fileMap.get(uri.path);
-    if (f) return f;
+    if (f && f.content === content) return f;
     else return new CodeFile(name, content, format, uri);
 }
 

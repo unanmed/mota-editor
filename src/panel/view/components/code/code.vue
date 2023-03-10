@@ -20,7 +20,7 @@
                     </span>
                     <CloseOutlined
                         class="file-close"
-                        @click.stop="code.remove(i)"
+                        @click.stop="code.remove(i, editor.saveViewState())"
                     />
                 </div>
             </div>
@@ -84,7 +84,7 @@ async function create() {
     editor = monaco.editor.create(codeMain, {
         theme: 'dark-plus',
         fontSize: 20,
-        fontFamily: 'code',
+        fontFamily: 'code, 微软雅黑',
         fontLigatures: true
     });
 
@@ -133,7 +133,7 @@ function listen() {
         file.value.saved.value = false;
     });
 
-    editor.onKeyUp(e => {
+    editor.onKeyDown(e => {
         if (e.ctrlKey && e.keyCode === monaco.KeyCode.KeyS) {
             file.value.save();
         }
