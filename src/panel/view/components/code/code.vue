@@ -1,9 +1,31 @@
 <template>
     <div class="code-root" :id="`code-root-${code.num}`">
         <div class="code-left" :style="{ width: `${leftWidth}px` }">
-            <div class="code-list unique-scroll"></div>
+            <div class="code-list unique-scroll">
+                <div
+                    class="code-list-one"
+                    :selected="i === selected"
+                    v-for="(file, i) of code.fileList"
+                    @click="code.select(i, editor.saveViewState())"
+                >
+                    <span class="file-name">
+                        <svg
+                            v-if="!file.saved.value"
+                            class="file-unsaved"
+                            fill="white"
+                        >
+                            <ellipse cx="8" cy="8" rx="6" ry="6"></ellipse>
+                        </svg>
+                        <span>{{ file.name }}</span>
+                    </span>
+                    <CloseOutlined
+                        class="file-close"
+                        @click.stop="code.remove(i)"
+                    />
+                </div>
+            </div>
         </div>
-        <div class="splitter"></div>
+        <div class="splitter" @mousedown="beginDrag"></div>
         <div
             class="code-right"
             :id="`code-right-${code.num}`"
@@ -18,32 +40,41 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
-import { CodeProps } from './code';
+import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
+import { CodeFile, CodeController } from './code';
 import * as monaco from 'monaco-editor';
-import { loadWASM } from 'onigasm';
 import { Registry } from 'monaco-textmate';
 import { wireTmGrammars } from 'monaco-editor-textmate';
+import { CloseOutlined } from '@ant-design/icons-vue';
+
+const props = defineProps<{
+    code: CodeController;
+    panelNum: number;
+}>();
 
 let codeMain: HTMLDivElement;
 let codeRight: HTMLDivElement;
 let codePanel: HTMLDivElement;
 let editor: monaco.editor.IStandaloneCodeEditor;
+let model: monaco.editor.IModel;
 
 let mutation: MutationObserver;
 
-const selected = ref(0);
+const selected = props.code.selected;
 
 const leftWidth = ref(200);
 const leftMax = 300;
 const leftMin = 100;
 
-const props = defineProps<{
-    code: CodeProps;
-    panelNum: number;
-}>();
-
 const show = computed(() => props.code.fileList.length > 0);
+
+function changeFile(index: number) {
+    const file = props.code.fileList[index];
+    if (!file) return;
+    editor.setModel(file.model);
+    editor.restoreViewState(file.view ?? null);
+    model = file.model;
+}
 
 /**
  * 创建编辑器
@@ -53,15 +84,10 @@ async function create() {
         theme: 'dark-plus',
         fontSize: 20,
         fontFamily: 'code',
-        fontLigatures: true,
-        language: 'javascript'
+        fontLigatures: true
     });
-    const wasm = await window.editor.extra.get('code/onigasm.wasm');
-    const ab = new ArrayBuffer(wasm.length);
-    const view = new Uint8Array(ab);
-    wasm.forEach((v, i) => (view[i] = v));
 
-    await loadWASM(ab);
+    watchEffect(() => changeFile(selected.value));
 
     const loadTM = async (path: string) => {
         return JSON.parse(await window.editor.extra.get(path, 'utf-8'));
@@ -91,13 +117,21 @@ async function create() {
         }
     });
 
-    await wireTmGrammars(monaco, registry, grammars, editor);
+    setTimeout(() => {
+        wireTmGrammars(monaco, registry, grammars, editor);
+    }, 250);
 
     editor.focus();
+    editor.setModel(props.code.fileList[selected.value]?.model);
 }
 
+/**
+ * 当窗口大小变化时，执行编辑器的resize
+ */
 function resize() {
-    mutation = new MutationObserver((list, observer) => {});
+    mutation = new MutationObserver((list, observer) => {
+        editor.layout();
+    });
 
     mutation.observe(codeRight, {
         attributes: true,
@@ -106,6 +140,34 @@ function resize() {
     mutation.observe(codePanel, {
         attributes: true,
         attributeFilter: ['style']
+    });
+}
+
+let xBefore = 0;
+let leftBefore = 0;
+let dragging = false;
+
+function beginDrag(e: MouseEvent) {
+    xBefore = e.clientX;
+    leftBefore = leftWidth.value;
+    dragging = true;
+    document.addEventListener('mousemove', drag);
+}
+
+function drag(e: MouseEvent) {
+    if (!dragging) return;
+    const x = e.clientX;
+    const dx = x - xBefore;
+    let toLeft = leftBefore + dx;
+    if (toLeft < leftMin) toLeft = leftMin;
+    if (toLeft > leftMax) toLeft = leftMax;
+    leftWidth.value = toLeft;
+}
+
+function mouseup() {
+    document.removeEventListener('mousemove', drag);
+    setTimeout(() => {
+        dragging = false;
     });
 }
 
@@ -129,10 +191,14 @@ onMounted(async () => {
     requestAnimationFrame(create);
 
     resize();
+
+    document.addEventListener('mouseup', mouseup);
 });
 
 onUnmounted(() => {
+    document.removeEventListener('mouseup', mouseup);
     mutation.disconnect();
+    props.code.added = false;
 });
 </script>
 
@@ -147,9 +213,11 @@ onUnmounted(() => {
 
 .code-list {
     display: flex;
+    flex-direction: column;
     width: 100%;
     overflow: hidden scroll;
     height: 100%;
+    padding: 8px 2px;
 }
 
 .code-main,
@@ -157,6 +225,10 @@ onUnmounted(() => {
     width: 100%;
     height: 100%;
     background-color: #222;
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 32px;
 }
 
 .code-empty {
@@ -164,6 +236,7 @@ onUnmounted(() => {
     justify-content: center;
     align-items: center;
     z-index: 1;
+    font-size: 32px;
 }
 
 .splitter {
@@ -188,5 +261,45 @@ onUnmounted(() => {
 
 .code-right {
     width: calc(100% - 202px);
+    position: relative;
+}
+
+.code-list-one {
+    font-size: 16px;
+    margin: 2px 5px;
+    padding: 2px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.1s linear;
+}
+
+.code-list-one:hover,
+.code-list-one[selected='true'] {
+    border-radius: 5px;
+    background-color: #444;
+}
+
+.file-name {
+    display: flex;
+    align-items: center;
+}
+
+.file-unsaved {
+    width: 16px;
+    height: 16px;
+    color: white;
+    margin-right: 12px;
+}
+
+.file-close {
+    padding: 2px;
+    border-radius: 3px;
+    transition: background-color 0.1s linear;
+}
+
+.file-close:hover {
+    background-color: #888;
 }
 </style>

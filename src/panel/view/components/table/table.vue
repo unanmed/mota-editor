@@ -22,6 +22,8 @@
                 :keys="key"
                 :data="data"
                 :n="n + 1"
+                :root="root"
+                :path="path"
             ></TableRenderer>
         </div>
     </div>
@@ -36,6 +38,8 @@ const props = defineProps<{
     keys: string;
     data: TableElement;
     n: number;
+    root: string;
+    path: string;
 }>();
 
 const opened = ref(true);

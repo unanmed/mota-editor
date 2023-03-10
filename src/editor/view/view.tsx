@@ -5,7 +5,7 @@ import {
 } from '../../panel/view/components/table/table';
 import { PanelProps, PanelType } from './panel';
 import Code from '../../panel/view/components/code/code.vue';
-import { CodeProps } from '../../panel/view/components/code/code';
+import { CodeController } from '../../panel/view/components/code/code';
 
 interface PanelViewProps<T extends PanelType> {
     type: T;
@@ -24,10 +24,12 @@ export function Panel<T extends PanelType>(props: PanelViewProps<T>) {
                 keys={(p as TableProps).keys ?? 'default'}
                 data={(p as TableProps).data}
                 n={0}
+                root={(p as TableProps).root}
+                path={''}
             ></TableRenderer>
         );
     } else if (type === 'code') {
-        return <Code code={p as CodeProps} panelNum={props.num}></Code>;
+        return <Code code={p as CodeController} panelNum={props.num}></Code>;
     }
     return <div></div>;
 }

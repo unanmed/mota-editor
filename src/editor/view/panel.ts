@@ -1,5 +1,5 @@
 import { ref, Ref } from 'vue';
-import { CodeProps } from '../../panel/view/components/code/code';
+import { CodeController } from '../../panel/view/components/code/code';
 import { TableProps } from '../../panel/view/components/table/table';
 import { view } from './control';
 
@@ -7,7 +7,7 @@ export type PanelType = 'table' | 'code';
 
 export interface PanelProps {
     table: TableProps;
-    code: CodeProps;
+    code: CodeController;
 }
 
 export class Panel<T extends PanelType = PanelType> {
@@ -68,7 +68,7 @@ export class Panel<T extends PanelType = PanelType> {
 
     close() {
         if (this.type === 'code') {
-            (this.props as CodeProps).close();
+            (this.props as CodeController).close();
         }
     }
 }

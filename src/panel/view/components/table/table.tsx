@@ -1,6 +1,8 @@
 import { Button } from 'ant-design-vue';
-import { addCode } from '../../control';
-import { CodeFile, codeList } from '../code/code';
+import { Uri } from 'monaco-editor';
+import { view } from '../../../../editor/view/control';
+import { addCode, showCode } from '../../control';
+import { CodeFile, codeList, createCodeFile } from '../code/code';
 import Table from './table.vue';
 
 export interface TableElement {
@@ -10,9 +12,11 @@ export interface TableElement {
 }
 
 export interface TableProps {
+    root: string;
     keys: string;
     data: TableElement;
     n: number;
+    path: string;
 }
 
 /**
@@ -23,13 +27,34 @@ export function TableRenderer(props: TableProps) {
     const data = props.data;
 
     if (data.type === 'object') {
-        return <Table keys={props.keys} data={data} n={props.n}></Table>;
+        return (
+            <Table
+                root={props.root}
+                keys={props.keys}
+                data={data}
+                n={props.n}
+                path={`${props.path}${props.path ? '/' : ''}${props.keys}`}
+            ></Table>
+        );
     } else {
         const edit = () => {
             if (data.type === 'code') {
                 const editor = codeList[0] ?? addCode();
                 if (!editor) return;
-                editor.add(new CodeFile(data.text, 'test', 'js'));
+                editor.add(
+                    createCodeFile(
+                        data.text,
+                        'test',
+                        'javascript',
+                        new Uri().with({
+                            path: `${props.root}://${props.path}${
+                                props.path ? '/' : ''
+                            }${props.keys}`
+                        })
+                    )
+                );
+
+                if (!editor.added) showCode(editor);
             }
         };
         return (
