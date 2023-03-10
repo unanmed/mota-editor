@@ -236,6 +236,7 @@ function beginDrag(e: MouseEvent) {
     startY = clientY;
     winX = left.value;
     winY = top.value;
+    document.addEventListener('mousemove', drag);
 }
 
 /**
@@ -264,6 +265,7 @@ function drag(e: MouseEvent) {
 }
 
 function mouseup() {
+    document.removeEventListener('mousemove', drag);
     setTimeout(() => {
         dragging = false;
         moved = false;
@@ -303,6 +305,7 @@ function beginResize(e: MouseEvent, type: string) {
         rightDrag = true;
         beforeWidth_b = width.value;
     }
+    document.addEventListener('mousemove', drag);
 }
 
 function dragLeft(e: MouseEvent) {
@@ -399,12 +402,10 @@ function relocate(e: UIEvent) {
 
 onMounted(() => {
     document.addEventListener('mouseup', mouseup);
-    document.addEventListener('mousemove', drag);
     window.addEventListener('resize', relocate);
 });
 
 onUnmounted(() => {
-    document.removeEventListener('mousemove', drag);
     document.removeEventListener('mouseup', mouseup);
     window.removeEventListener('resize', relocate);
 });
