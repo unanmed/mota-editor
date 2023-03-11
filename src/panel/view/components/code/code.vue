@@ -208,6 +208,7 @@ onMounted(async () => {
     resize();
 
     document.addEventListener('mouseup', mouseup);
+    props.code.added = true;
 });
 
 onUnmounted(() => {

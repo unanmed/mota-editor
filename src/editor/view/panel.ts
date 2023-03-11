@@ -61,14 +61,13 @@ export class Panel<T extends PanelType = PanelType> {
             }
         });
         this.focused.value = true;
-        if (!this.toped) this.zIndex.value = 1;
-        else this.zIndex.value = 10;
+        if (this.toped) this.zIndex.value = 10;
+        const last = view.list.shift();
+        if (last) view.list.push(last);
         return this;
     }
 
     close() {
-        if (this.type === 'code') {
-            (this.props as CodeController).close();
-        }
+        view.remove(this);
     }
 }

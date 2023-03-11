@@ -84,8 +84,15 @@ import {
     DownloadOutlined
 } from '@ant-design/icons-vue';
 import { Panel } from './view';
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { content, view } from './control';
+
+const props = defineProps<{
+    name: string;
+    type: PanelType;
+    p: any;
+    panel: P<PanelType>;
+}>();
 
 const maxed = ref(false);
 const mined = ref(false);
@@ -95,13 +102,6 @@ const left = ref<number>(0);
 const width = ref<number>(0);
 const top = ref<number>(0);
 const height = ref<number>(0);
-
-const props = defineProps<{
-    name: string;
-    type: PanelType;
-    p: any;
-    panel: P<PanelType>;
-}>();
 
 width.value = props.panel.width;
 height.value = props.panel.height;

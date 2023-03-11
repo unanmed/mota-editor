@@ -1,8 +1,14 @@
 import { Button } from 'ant-design-vue';
 import { Uri } from 'monaco-editor';
 import { projectInfo } from '../../../../editor/project/project';
+import { view } from '../../../../editor/view/control';
 import { addCode, showCode } from '../../control';
-import { CodeFile, codeList, createCodeFile } from '../code/code';
+import {
+    CodeController,
+    CodeFile,
+    codeList,
+    createCodeFile
+} from '../code/code';
 import Table from './table.vue';
 
 export interface TableElement {
@@ -43,16 +49,15 @@ export function TableRenderer(props: TableProps) {
                 const editor = codeList[0] ?? addCode();
                 if (!editor) return;
                 const uri = new Uri().with({
-                    path: `table://${props.path}${props.path ? '.' : ''}${
-                        props.keys
-                    }`
+                    path: `${props.path}${props.path ? '.' : ''}${props.keys}`,
+                    scheme: props.root
                 });
                 const content = getTableValue(uri, data.type);
                 const file = createCodeFile(data.text, content, lang, uri);
                 editor.add(file);
                 onTableSave(file, data.type);
 
-                if (!editor.added) showCode(editor);
+                if (!editor.added) tryShowCode(editor);
             }
         };
         return (
@@ -70,8 +75,9 @@ export function TableRenderer(props: TableProps) {
 }
 
 export function getTableObject(uri: Uri) {
-    const key = uri.path.split('/')[3];
-    const stack = key.split('.');
+    const scheme = uri.scheme;
+
+    const stack = uri.path.split('.');
     const datas = {
         data: projectInfo.project!.mainData
     };
@@ -101,4 +107,10 @@ function onTableSave(file: CodeFile, type: 'code' | 'text' = 'code') {
         else root[key] = content;
         return true;
     });
+}
+
+function tryShowCode(editor: CodeController) {
+    const panel = view.list.find(v => v.type === 'code');
+    panel?.close();
+    showCode(editor);
 }
