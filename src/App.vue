@@ -29,6 +29,8 @@ import Titlebar from './panel/title/titlebar.vue';
 import Empty from './panel/main/empty.vue';
 import { view } from './editor/view/control';
 import EditorView from './editor/view/editorView.vue';
+import { extractKeyCode } from './editor/utils/keycode/extract';
+import { KeyCode } from './editor/utils/keycode/keyCodes';
 
 let side: HTMLDivElement;
 let bottom: HTMLDivElement;
@@ -59,6 +61,15 @@ onMounted(() => {
         },
         { immediate: true }
     );
+
+    if (!import.meta.env.DEV) {
+        document.addEventListener('keydown', e => {
+            const c = extractKeyCode(e);
+            if (c === KeyCode.KeyR && e.ctrlKey) {
+                e.preventDefault();
+            }
+        });
+    }
 });
 </script>
 

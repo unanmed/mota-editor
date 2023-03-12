@@ -427,6 +427,13 @@ export const helpMenu = new Menu([
             window.dev.open();
             return true;
         }
+    },
+    {
+        text: '重新加载',
+        fn: () => {
+            location.reload();
+            return true;
+        }
     }
 ]);
 helpMenu.setPos(272, 40);

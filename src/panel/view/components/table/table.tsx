@@ -75,8 +75,6 @@ export function TableRenderer(props: TableProps) {
 }
 
 export function getTableObject(uri: Uri) {
-    const scheme = uri.scheme;
-
     const stack = uri.path.split('.');
     const datas = {
         data: projectInfo.project!.mainData
@@ -105,6 +103,9 @@ function onTableSave(file: CodeFile, type: 'code' | 'text' = 'code') {
     file.on('save', (content: string) => {
         if (type === 'code') root[key] = JSON.parse(content);
         else root[key] = content;
+        const scheme = file.uri.scheme;
+        if (scheme === 'data') {
+        }
         return true;
     });
 }
@@ -113,4 +114,18 @@ function tryShowCode(editor: CodeController) {
     const panel = view.list.find(v => v.type === 'code');
     panel?.close();
     showCode(editor);
+}
+
+function onTableChange(file: CodeFile) {
+    const content = getTableValue(file.uri);
+    file.model.setValue(content);
+}
+
+export function watchTableChange(file: CodeFile) {
+    const scheme = file.uri.scheme;
+    if (scheme === 'data') {
+        projectInfo.project!.on('mainDataChange', data => {
+            onTableChange(file);
+        });
+    }
 }

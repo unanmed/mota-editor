@@ -1,5 +1,5 @@
 import { dialog, ipcMain } from 'electron';
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
 import { MotaProject, projectList } from './project';
 
 export class ProjectSelector {
@@ -31,7 +31,7 @@ export class ProjectSelector {
      * @param path 项目路径
      */
     async open(path: string) {
-        const project = new MotaProject(path.replace(/[\/\\]{1}[^\/\\]*$/, ''));
+        const project = new MotaProject(dirname(path));
         return await project.whenReady().then(() => project.open());
     }
 

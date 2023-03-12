@@ -27,4 +27,9 @@ interface ProjectHandler {
      * 获取最近的项目
      */
     getRecent(): Promise<string[]>;
+
+    /**
+     * 向主进程发送当前窗口的项目信息
+     */
+    sendProjectInfo(path: string): Promise<void>;
 }

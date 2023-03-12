@@ -149,8 +149,10 @@ function maxSize() {
     const { clientWidth, clientHeight } = content;
     const toWidth = clientWidth > maxWidth ? maxWidth : clientWidth - 2;
     const toHeight = clientHeight > maxHeight ? maxHeight : clientHeight;
-    const toX = left.value + toWidth > clientWidth ? 0 : left.value;
-    const toY = top.value + toHeight > clientHeight ? 0 : top.value;
+    const toX =
+        left.value + toWidth > clientWidth || left.value < 0 ? 0 : left.value;
+    const toY =
+        top.value + toHeight > clientHeight || top.value < 0 ? 0 : top.value;
     beforeWidth = width.value;
     beforeHeight = mined.value ? beforeHeight_min : height.value;
     beforeX = left.value;

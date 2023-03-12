@@ -69,6 +69,8 @@ export class MotaProject {
     /** 当前目录是否合法 */
     valid: boolean = true;
 
+    data!: MotaProjectData;
+
     private testPromise: Promise<void>;
 
     constructor(path: string) {
@@ -230,6 +232,8 @@ export class MotaProject {
         }
         config.recent.unshift(this.dir);
 
+        this.data = project;
+
         await first.writeToFile();
 
         return project;
@@ -280,6 +284,12 @@ export class MotaProject {
                 'utf-8'
             );
             return { name };
+        }
+    }
+
+    async save(info: string, content: string) {
+        if (info === 'data') {
+            await fs.writeFile(`${this.dir}/project/data.js`, content, 'utf-8');
         }
     }
 
@@ -345,5 +355,9 @@ export class MotaProject {
             name: file,
             content: await fs.readFile(resolve(path, file), encoding)
         };
+    }
+
+    private doWatch() {
+        // 全塔属性
     }
 }

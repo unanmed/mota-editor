@@ -1,6 +1,7 @@
 import { Ref, ref, shallowReactive } from 'vue';
 import * as monaco from 'monaco-editor';
 import { Panel } from '../../../../editor/view/panel';
+import { watchTableChange } from '../table/table';
 
 type CodeFormat = 'javascript' | 'text';
 
@@ -35,7 +36,7 @@ export class CodeController {
             const index = this.indexOf(uri);
 
             if (index === -1) {
-                const f = fileMap.get(uri.path);
+                const f = fileMap.get(uri.toString());
                 const name = path.split(/(\/|\\)/).at(-1)!;
                 const file = f ?? createCodeFile(name, content, type, uri);
                 this.select(this.fileList.push(file) - 1);
@@ -46,7 +47,7 @@ export class CodeController {
             const uri = path.uri;
             const index = this.indexOf(uri);
             if (index === -1) {
-                const f = fileMap.get(uri.path);
+                const f = fileMap.get(uri.toString());
                 const file = f ?? path;
                 this.select(this.fileList.push(file) - 1);
             } else {
@@ -117,11 +118,14 @@ export class CodeFile {
         this.model = monaco.editor.createModel(this.content, format);
         this.model.setValue(content);
         this.uri = uri;
-        const f = fileMap.get(uri.path);
-        if (!f) fileMap.set(uri.path, this);
+        const f = fileMap.get(uri.toString());
+        if (!f) fileMap.set(uri.toString(), this);
         else {
             this.content = f.content;
         }
+
+        // 执行监听系统
+        this.doWatch();
     }
 
     save() {
@@ -136,6 +140,12 @@ export class CodeFile {
         this.listen[type] ??= [];
         this.listen[type]!.push(fn);
     }
+
+    private doWatch() {
+        const scheme = this.uri.scheme;
+        // 全塔属性
+        if (scheme === 'data') watchTableChange(this);
+    }
 }
 
 export function createCodeFile(
@@ -144,7 +154,7 @@ export function createCodeFile(
     format: CodeFormat,
     uri: monaco.Uri
 ) {
-    const f = fileMap.get(uri.path);
+    const f = fileMap.get(uri.toString());
     if (f && f.content === content) return f;
     else return new CodeFile(name, content, format, uri);
 }

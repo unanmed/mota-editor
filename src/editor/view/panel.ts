@@ -54,16 +54,20 @@ export class Panel<T extends PanelType = PanelType> {
     }
 
     focus() {
-        view.list.forEach(v => {
+        let index = -1;
+        view.list.forEach((v, i) => {
             v.focused.value = false;
             if (!v.toped) {
                 v.zIndex.value = 0;
             }
+            if (v === this) index = i;
         });
         this.focused.value = true;
         if (this.toped) this.zIndex.value = 10;
-        const last = view.list.shift();
-        if (last) view.list.push(last);
+        if (index !== -1) {
+            view.list.splice(index, 1);
+            view.list.push(this);
+        }
         return this;
     }
 
