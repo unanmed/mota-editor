@@ -54,5 +54,8 @@ export class EditorWindow extends MotaWindow {
         if (!this.project) return;
         this.watcher = new MotaProjectWatcher(this.project);
         this.watcher.start();
+        this.watcher.on('add', f => console.log(f));
     }
+
+    startServer() {}
 }
