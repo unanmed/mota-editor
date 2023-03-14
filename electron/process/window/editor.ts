@@ -39,6 +39,7 @@ export class EditorWindow extends MotaWindow {
         }
 
         this.onSelectProject();
+        this.doWatch();
     }
 
     close(): void {
