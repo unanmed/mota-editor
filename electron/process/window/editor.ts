@@ -1,13 +1,15 @@
 import { BrowserWindow, ipcMain } from 'electron';
 import { resolve } from 'path';
+import { MotaProject, projectList } from '../editor/project/project';
 import { MotaProjectWatcher } from '../editor/project/watch';
+import { MotaSocketServer } from '../editor/server/socket';
 import { injectWithWindow } from '../inject';
 import { MotaWindow } from './control';
 
 export class EditorWindow extends MotaWindow {
     win: BrowserWindow;
     closed: boolean = false;
-    project?: string;
+    project?: MotaProject;
     watcher?: MotaProjectWatcher;
 
     constructor() {
@@ -45,17 +47,15 @@ export class EditorWindow extends MotaWindow {
 
     onSelectProject() {
         ipcMain.on('projectInfo', (e, path: string) => {
-            if (e.sender === this.win.webContents) this.project = path;
-            this.doWatch();
+            if (e.sender === this.win.webContents) {
+                this.project = projectList.find(v => v.dir === path);
+            }
+            if (this.project) this.doWatch();
         });
     }
 
     doWatch() {
-        if (!this.project) return;
-        this.watcher = new MotaProjectWatcher(this.project);
-        this.watcher.start();
-        this.watcher.on('add', f => console.log(f));
+        const socket = new MotaSocketServer(this.project!.dir, this.project!);
+        socket.start();
     }
-
-    startServer() {}
 }
