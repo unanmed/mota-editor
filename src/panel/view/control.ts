@@ -4,7 +4,7 @@ import { Panel } from '../../editor/view/panel';
 import { TableElement } from './components/table/table';
 import { CodeFile, CodeController } from './components/code/code';
 
-const tables: Record<string, TableElement> = {};
+export const tables: Record<string, TableElement> = {};
 
 (async function () {
     const data = (await window.editor.extra.get(

@@ -70,6 +70,7 @@ export class MotaProject {
     valid: boolean = true;
 
     data!: MotaProjectData;
+    mainData!: DataCore;
 
     private testPromise: Promise<void>;
 
@@ -199,6 +200,13 @@ export class MotaProject {
                 folder: !(await fs.stat(resolve(this.dir, v))).isFile()
             };
         }
+
+        this.mainData = JSON.parse(
+            mainInfo[0].content
+                .split(/(\n|\r\n)/)
+                .slice(1)
+                .join('')
+        );
 
         const project: MotaProjectData = {
             floors,
@@ -355,9 +363,5 @@ export class MotaProject {
             name: file,
             content: await fs.readFile(resolve(path, file), encoding)
         };
-    }
-
-    private doWatch() {
-        // 全塔属性
     }
 }

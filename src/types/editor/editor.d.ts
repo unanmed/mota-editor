@@ -7,6 +7,7 @@ declare global {
             project: ProjectHandler;
             extra: ExtraHandler;
             file: FileHandler;
+            socket: SocketHandler;
         };
     }
 }

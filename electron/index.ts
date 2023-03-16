@@ -1,10 +1,8 @@
 import { app, BrowserWindow, ipcMain, WebContents } from 'electron';
 import { writeAllConfigFiles } from './process/config/control';
 import { injectCommonModules, injectWithWindow } from './process/inject';
-import { WindowController } from './process/window/control';
+import { controller, WindowController } from './process/window/control';
 import { EditorWindow } from './process/window/editor';
-
-const controller = new WindowController();
 
 injectCommonModules();
 

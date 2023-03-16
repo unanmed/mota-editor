@@ -20,7 +20,7 @@ contextBridge.exposeInMainWorld('editor', {
     file: {
         read: (path, options) => ipcRenderer.invoke('file.read', path, options)
     },
-    watch: {
-        on: (type, fn) => ipcRenderer.on(type, fn)
+    socket: {
+        getPort: path => ipcRenderer.invoke('socket.getPort', path)
     }
 });

@@ -1,5 +1,12 @@
 import { ref, Ref } from 'vue';
 import type { MotaProjectData } from '../../../electron/process/editor/project/project';
+import {
+    CodeFile,
+    codeList,
+    getFormatedString
+} from '../../panel/view/components/code/code';
+import { getTableObject } from '../../panel/view/components/table/table';
+import { SocketHandler, WebSocketMessageData } from './socket';
 
 interface ProjectEvent {
     mainDataChange: (data: DataCore) => void;
@@ -9,6 +16,7 @@ export class Project {
     name: string;
     title: string;
     version: string;
+    socket: SocketHandler;
 
     events: {
         [K in keyof ProjectEvent]?: ProjectEvent[K][];
@@ -31,9 +39,14 @@ export class Project {
         projectInfo.version.value = this.version;
 
         window.editor.project.sendProjectInfo(this.data.path);
+        this.socket = new SocketHandler(this);
+        this.socket.start().then(() => this.setupSocket());
 
-        // 执行监听
-        this.doWatch();
+        this.setup();
+    }
+
+    setup() {
+        this.watchTableChange();
     }
 
     close() {}
@@ -47,13 +60,8 @@ export class Project {
         this.events[event]?.forEach(v => v(params));
     }
 
-    private doWatch() {
-        // 全塔属性
-        // ipcRenderer.on('mainDataChange', (e, content: string) => {
-        //     this.data.mainInfo[0].content = content;
-        //     this.mainData = this.parseJSONEDMotaData(content);
-        //     this.dispatch('mainDataChange', this.mainData);
-        // });
+    setupSocket() {
+        this.socket.on('change', (data, e) => this.handleChange(data));
     }
 
     private parseJSONEDMotaData(content: string) {
@@ -63,6 +71,37 @@ export class Project {
                 .slice(1)
                 .join('')
         );
+    }
+
+    private handleChange(data: WebSocketMessageData['change']) {
+        // 全塔属性
+        if (/project(\/|\\)+data.js/.test(data.file)) {
+            const mainData = this.parseJSONEDMotaData(
+                data.content.data as string
+            );
+            this.mainData = mainData;
+            this.dispatch('mainDataChange', mainData);
+        }
+    }
+
+    private watchTableChange() {
+        // 全塔属性
+        this.on('mainDataChange', data => {
+            const check = (list: CodeFile[]) => {
+                list.forEach(v => {
+                    if (!v.saved.value) return;
+                    if (v.uri.scheme !== 'data') return;
+                    const content = getTableObject(v.uri, { data });
+                    const text = getFormatedString(
+                        content.content,
+                        content.info.type as 'json' | 'code' | 'text'
+                    );
+                    v.model.setValue(text);
+                    v.saved.value = true;
+                });
+            };
+            codeList.forEach(v => check(v.fileList));
+        });
     }
 }
 

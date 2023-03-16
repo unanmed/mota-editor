@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron';
+import { BrowserWindow, WebContents } from 'electron';
 
 export class WindowController {
     list: MotaWindow[] = [];
@@ -16,11 +16,18 @@ export class WindowController {
         if (index === -1) return;
         this.list.splice(index, 1);
     }
+
+    find(window: WebContents) {
+        return this.list.find(v => v.win.webContents === window);
+    }
 }
 
 export abstract class MotaWindow {
     closed: boolean = false;
+    root?: string;
     abstract win: BrowserWindow;
 
     abstract close(): void;
 }
+
+export const controller = new WindowController();

@@ -1,19 +1,16 @@
-import fs from 'fs';
 import { relative, resolve } from 'path';
 import chokidar from 'chokidar';
 
 type MotaWatchType = 'change' | 'add' | 'remove';
-type MotaWatchFn = (file: string) => void;
+type MotaWatchFn = (file: string, abs: string) => void;
 
 export class MotaProjectWatcher {
     path: string;
-    watcher?: fs.FSWatcher;
+    watcher?: chokidar.FSWatcher;
 
     event: {
         [P in MotaWatchType]?: MotaWatchFn[];
     } = {};
-
-    private folders: Record<string, string[]> = {};
 
     constructor(path: string) {
         this.path = path;
@@ -53,7 +50,7 @@ export class MotaProjectWatcher {
     }
 
     dispatch(type: MotaWatchType, file: string) {
-        this.event[type]?.forEach(v => v(relative(this.path, file)));
+        this.event[type]?.forEach(v => v(relative(this.path, file), file));
     }
 
     /**
@@ -71,5 +68,9 @@ export class MotaProjectWatcher {
     on<T extends MotaWatchType>(type: T, fn: MotaWatchFn) {
         this.event[type] ??= [];
         this.event[type]!.push(fn);
+    }
+
+    off(type: 'all') {
+        this.event = {};
     }
 }

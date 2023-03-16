@@ -10,7 +10,8 @@ export default defineConfig({
     plugins: [
         vue(),
         electron({
-            entry: 'electron/index.ts'
+            entry: 'electron/index.ts',
+            vite: {}
         }),
         jsx(),
         component({ resolvers: [AntDesignVueResolver()] })

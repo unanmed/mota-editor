@@ -2,7 +2,7 @@ import { Button } from 'ant-design-vue';
 import { Uri } from 'monaco-editor';
 import { projectInfo } from '../../../../editor/project/project';
 import { view } from '../../../../editor/view/control';
-import { addCode, showCode } from '../../control';
+import { addCode, showCode, tables } from '../../control';
 import {
     CodeController,
     CodeFile,
@@ -12,7 +12,7 @@ import {
 import Table from './table.vue';
 
 export interface TableElement {
-    type: 'object' | 'code' | 'text';
+    type: 'object' | 'code' | 'text' | 'json';
 
     [key: string]: any;
 }
@@ -44,8 +44,12 @@ export function TableRenderer(props: TableProps) {
         );
     } else {
         const edit = () => {
-            if (data.type === 'code' || data.type === 'text') {
-                const lang = data.type === 'code' ? 'javascript' : 'text';
+            if (
+                data.type === 'code' ||
+                data.type === 'text' ||
+                data.type === 'json'
+            ) {
+                const lang = data.type === 'code' ? 'javascript' : data.type;
                 const editor = codeList[0] ?? addCode();
                 if (!editor) return;
                 const uri = new Uri().with({
@@ -74,34 +78,37 @@ export function TableRenderer(props: TableProps) {
     }
 }
 
-export function getTableObject(uri: Uri) {
+export function getTableObject(uri: Uri, data?: any) {
     const stack = uri.path.split('.');
-    const datas = {
+    const datas = data || {
         data: projectInfo.project!.mainData
     };
+    let info = tables[stack[0]];
     let now: any = datas[stack[0] as keyof typeof datas];
     let root: any;
     for (let i = 1; i < stack.length; i++) {
         now = now[stack[i]];
+        info = info.data[stack[i]];
         if (i === stack.length - 2) root = now;
     }
     return {
         root,
-        content: now
+        content: now,
+        info
     };
 }
 
-function getTableValue(uri: Uri, type: 'code' | 'text' = 'code') {
+function getTableValue(uri: Uri, type: 'code' | 'text' | 'json' = 'code') {
     const { content } = getTableObject(uri);
-    if (type === 'code') return JSON.stringify(content, void 0, 4);
+    if (type === 'json') return JSON.stringify(content, void 0, 4);
     else return content;
 }
 
-function onTableSave(file: CodeFile, type: 'code' | 'text' = 'code') {
+function onTableSave(file: CodeFile, type: 'code' | 'text' | 'json' = 'code') {
     const { root } = getTableObject(file.uri);
     const key = file.uri.path.split('.').at(-1)!;
     file.on('save', (content: string) => {
-        if (type === 'code') root[key] = JSON.parse(content);
+        if (type === 'json') root[key] = JSON.parse(content);
         else root[key] = content;
         const scheme = file.uri.scheme;
         if (scheme === 'data') {
@@ -114,18 +121,4 @@ function tryShowCode(editor: CodeController) {
     const panel = view.list.find(v => v.type === 'code');
     panel?.close();
     showCode(editor);
-}
-
-function onTableChange(file: CodeFile) {
-    const content = getTableValue(file.uri);
-    file.model.setValue(content);
-}
-
-export function watchTableChange(file: CodeFile) {
-    const scheme = file.uri.scheme;
-    if (scheme === 'data') {
-        projectInfo.project!.on('mainDataChange', data => {
-            onTableChange(file);
-        });
-    }
 }

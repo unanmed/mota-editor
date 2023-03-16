@@ -1,9 +1,8 @@
 import { Ref, ref, shallowReactive } from 'vue';
 import * as monaco from 'monaco-editor';
 import { Panel } from '../../../../editor/view/panel';
-import { watchTableChange } from '../table/table';
 
-type CodeFormat = 'javascript' | 'text';
+type CodeFormat = 'javascript' | 'text' | 'json';
 
 const fileMap = new Map<string, CodeFile>();
 
@@ -123,9 +122,6 @@ export class CodeFile {
         else {
             this.content = f.content;
         }
-
-        // 执行监听系统
-        this.doWatch();
     }
 
     save() {
@@ -139,12 +135,6 @@ export class CodeFile {
     on(type: CodeListener, fn: (p: any) => any) {
         this.listen[type] ??= [];
         this.listen[type]!.push(fn);
-    }
-
-    private doWatch() {
-        const scheme = this.uri.scheme;
-        // 全塔属性
-        if (scheme === 'data') watchTableChange(this);
     }
 }
 
@@ -160,3 +150,8 @@ export function createCodeFile(
 }
 
 export const codeList: CodeController[] = [];
+
+export function getFormatedString(data: any, type: 'code' | 'json' | 'text') {
+    if (type === 'json') return JSON.stringify(data, void 0, 4);
+    else return data as string;
+}
