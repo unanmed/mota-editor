@@ -12,7 +12,8 @@ import {
 import Table from './table.vue';
 
 export interface TableElement {
-    type: 'object' | 'code' | 'text' | 'json';
+    type: 'object' | 'code' | 'text' | 'json' | 'select';
+    text: string;
 
     [key: string]: any;
 }

@@ -1,5 +1,5 @@
 import { app, ipcMain } from 'electron';
-import { readFile } from 'fs/promises';
+import { readdir, readFile } from 'fs/promises';
 import { resolve } from 'path';
 
 const root = app.getAppPath();
@@ -16,4 +16,5 @@ export function injectExtraInterface() {
     );
 
     ipcMain.handle('file.read', (e, path, options) => readFile(path, options));
+    ipcMain.handle('file.readdir', (e, path) => readdir(path));
 }

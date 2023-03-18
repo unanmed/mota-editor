@@ -100,7 +100,7 @@ export class Project {
                     v.saved.value = true;
                 });
             };
-            codeList.forEach(v => check(v.fileList));
+            codeList.forEach(v => check(v.list));
         });
     }
 }

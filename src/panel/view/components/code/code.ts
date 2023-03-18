@@ -1,19 +1,17 @@
 import { Ref, ref, shallowReactive } from 'vue';
 import * as monaco from 'monaco-editor';
 import { Panel } from '../../../../editor/view/panel';
+import { MultiController, MultiItem } from '../multi/multi';
 
 type CodeFormat = 'javascript' | 'text' | 'json';
 
 const fileMap = new Map<string, CodeFile>();
 
-// 代码编辑器props，处理文件列表
-export class CodeController {
+// 代码编辑器，处理文件列表
+export class CodeController extends MultiController<CodeFile> {
     private static num = 0;
 
-    fileList: CodeFile[] = shallowReactive([]);
-
     added: boolean = false;
-    selected: Ref<number> = ref(-1);
 
     panel?: Panel;
 
@@ -22,11 +20,10 @@ export class CodeController {
     readonly num = CodeController.num++;
 
     constructor() {
+        super();
         codeList.push(this);
     }
 
-    async add(content: CodeFile): Promise<void>;
-    async add(path: string): Promise<void>;
     async add(path: string | CodeFile) {
         if (typeof path === 'string') {
             const content = await window.editor.file.read(path, 'utf-8');
@@ -38,7 +35,7 @@ export class CodeController {
                 const f = fileMap.get(uri.toString());
                 const name = path.split(/(\/|\\)/).at(-1)!;
                 const file = f ?? createCodeFile(name, content, type, uri);
-                this.select(this.fileList.push(file) - 1);
+                this.select(this.list.push(file) - 1);
             } else {
                 this.select(index);
             }
@@ -48,7 +45,7 @@ export class CodeController {
             if (index === -1) {
                 const f = fileMap.get(uri.toString());
                 const file = f ?? path;
-                this.select(this.fileList.push(file) - 1);
+                this.select(this.list.push(file) - 1);
             } else {
                 this.select(index);
             }
@@ -56,13 +53,13 @@ export class CodeController {
     }
 
     remove(index: number, view?: monaco.editor.ICodeEditorViewState | null) {
-        const file = this.fileList[index];
+        const file = this.list[index];
         if (view) file.view = view;
-        this.fileList.splice(index, 1);
+        this.list.splice(index, 1);
         this.selectStack = this.selectStack.filter(v => v !== file.uri.path);
         if (this.selected.value === index) {
             const index = this.indexOf(this.selectStack.pop() ?? '');
-            if (this.fileList[index]) this.select(index);
+            if (this.list[index]) this.select(index);
         }
     }
 
@@ -72,17 +69,9 @@ export class CodeController {
         codeList.splice(index, 1);
     }
 
-    indexOf(path: string): number;
-    indexOf(uri: monaco.Uri): number;
-    indexOf(uri: monaco.Uri | string) {
-        if (typeof uri === 'string') {
-            return this.fileList.findIndex(v => v.uri.path === uri);
-        } else return this.fileList.findIndex(v => v.uri.path === uri.path);
-    }
-
     select(index: number, view?: monaco.editor.ICodeEditorViewState | null) {
-        const file = this.fileList[index];
-        if (view) this.fileList[this.selected.value].view = view;
+        const file = this.list[index];
+        if (view) this.list[this.selected.value].view = view;
         this.selectStack.push(file.uri.path);
         if (this.selectStack.length > 50) this.selectStack.shift();
         this.selected.value = index;
@@ -90,20 +79,15 @@ export class CodeController {
     }
 }
 
-type CodeListener = 'save';
-
 // 文件类，处理文件
-export class CodeFile {
+export class CodeFile extends MultiItem {
     name: string;
     content: string;
     saved: Ref<boolean> = ref(true);
     format: CodeFormat;
 
     model: monaco.editor.IModel;
-    uri: monaco.Uri;
     view?: monaco.editor.ICodeEditorViewState;
-
-    listen: Record<string, ((p: any) => any)[]> = {};
 
     constructor(
         name: string,
@@ -111,12 +95,12 @@ export class CodeFile {
         format: CodeFormat,
         uri: monaco.Uri
     ) {
+        super(uri);
         this.name = name;
         this.content = content;
         this.format = format;
         this.model = monaco.editor.createModel(this.content, format);
         this.model.setValue(content);
-        this.uri = uri;
         const f = fileMap.get(uri.toString());
         if (!f) fileMap.set(uri.toString(), this);
         else {
@@ -126,15 +110,10 @@ export class CodeFile {
 
     save() {
         let success = true;
-        this.listen.save?.forEach(v => {
+        this.event.save?.forEach(v => {
             if (!v(this.model.getValue())) success = false;
         });
         if (success) this.saved.value = true;
-    }
-
-    on(type: CodeListener, fn: (p: any) => any) {
-        this.listen[type] ??= [];
-        this.listen[type]!.push(fn);
     }
 }
 
