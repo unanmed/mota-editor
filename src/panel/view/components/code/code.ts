@@ -89,6 +89,8 @@ export class CodeFile extends MultiItem<string> {
     model: monaco.editor.IModel;
     view?: monaco.editor.ICodeEditorViewState;
 
+    canWatch: boolean = true;
+
     constructor(
         name: string,
         content: string,
@@ -108,12 +110,17 @@ export class CodeFile extends MultiItem<string> {
         }
     }
 
-    save() {
+    async save() {
+        this.canWatch = false;
         let success = true;
-        this.event.save?.forEach(v => {
-            if (!v(this.model.getValue())) success = false;
-        });
+        if (!this.event.save) return;
+        for await (const fn of this.event.save!) {
+            if (!(await fn(this.model.getValue()))) success = false;
+        }
         if (success) this.saved.value = true;
+        setTimeout(() => {
+            this.canWatch = true;
+        }, 100);
     }
 }
 

@@ -76,20 +76,20 @@ export class Project {
     private handleChange(data: WebSocketMessageData['change']) {
         // 全塔属性
         if (/project(\/|\\)+data.js/.test(data.file)) {
-            const mainData = this.parseJSONEDMotaData(
-                data.content.data as string
-            );
-            this.mainData = mainData;
-            this.dispatch('mainDataChange', mainData);
+            this.dispatch('mainDataChange', this.mainData);
         }
     }
 
     private watchTableChange() {
         // 全塔属性
         this.on('mainDataChange', data => {
+            projectInfo.name.value = this.mainData.firstData.name;
+            projectInfo.title.value = this.mainData.firstData.title;
+            projectInfo.version.value = this.mainData.firstData.version;
+
             const check = (list: CodeFile[]) => {
                 list.forEach(v => {
-                    if (!v.saved.value) return;
+                    if (!v.saved.value || !v.canWatch) return;
                     if (v.uri.scheme !== 'data') return;
                     const content = getTableObject(v.uri, { data });
                     const text = getFormatedString(
