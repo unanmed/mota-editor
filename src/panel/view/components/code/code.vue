@@ -5,7 +5,7 @@
                 <div
                     class="code-list-one"
                     :selected="i === selected"
-                    v-for="(file, i) of code.fileList"
+                    v-for="(file, i) of code.list"
                     @click="code.select(i, editor.saveViewState())"
                 >
                     <span class="file-name">
@@ -66,11 +66,11 @@ const leftWidth = ref(200);
 const leftMax = 300;
 const leftMin = 100;
 
-const show = computed(() => props.code.fileList.length > 0);
-const file = computed(() => props.code.fileList[selected.value]);
+const show = computed(() => props.code.list.length > 0);
+const file = computed(() => props.code.list[selected.value]);
 
 function changeFile(index: number) {
-    const file = props.code.fileList[index];
+    const file = props.code.list[index];
     if (!file) return;
     editor.setModel(file.model);
     editor.restoreViewState(file.view ?? null);
@@ -123,7 +123,7 @@ async function create() {
     }, 250);
 
     editor.focus();
-    editor.setModel(props.code.fileList[selected.value]?.model);
+    editor.setModel(props.code.list[selected.value]?.model);
 
     listen();
 }

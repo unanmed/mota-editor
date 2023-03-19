@@ -25,12 +25,12 @@ export abstract class MultiController<Item extends MultiItem> {
     }
 }
 
-interface MultiItemEvent {
-    save: (content: any) => boolean;
+interface MultiItemEvent<Content = any> {
+    save: (content: Content) => Promise<boolean>;
 }
 
-export abstract class MultiItem<Event = {}> extends EventEmitter<
-    MultiItemEvent & Event
+export abstract class MultiItem<Content = any, Event = {}> extends EventEmitter<
+    MultiItemEvent<Content> & Event
 > {
     uri: Uri;
 
@@ -39,5 +39,5 @@ export abstract class MultiItem<Event = {}> extends EventEmitter<
         this.uri = uri;
     }
 
-    abstract save(content?: any): void;
+    abstract save(content?: Content): void;
 }

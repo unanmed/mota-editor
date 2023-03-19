@@ -87,15 +87,18 @@ export function getTableObject(uri: Uri, data?: any) {
     let info = tables[stack[0]];
     let now: any = datas[stack[0] as keyof typeof datas];
     let root: any;
+    let lastKey: string = '';
     for (let i = 1; i < stack.length; i++) {
         now = now[stack[i]];
         info = info.data[stack[i]];
+        lastKey = stack[i];
         if (i === stack.length - 2) root = now;
     }
     return {
         root,
         content: now,
-        info
+        info,
+        lastKey
     };
 }
 
@@ -106,13 +109,24 @@ function getTableValue(uri: Uri, type: 'code' | 'text' | 'json' = 'code') {
 }
 
 function onTableSave(file: CodeFile, type: 'code' | 'text' | 'json' = 'code') {
-    const { root } = getTableObject(file.uri);
-    const key = file.uri.path.split('.').at(-1)!;
-    file.on('save', (content: string) => {
+    const { root, lastKey: key } = getTableObject(file.uri);
+    file.on('save', async (content: string) => {
+        // 对表格数据赋值
         if (type === 'json') root[key] = JSON.parse(content);
         else root[key] = content;
         const scheme = file.uri.scheme;
+        // 保存至本地文件
         if (scheme === 'data') {
+            const content = JSON.stringify(
+                projectInfo.project!.mainData,
+                void 0,
+                4
+            );
+            await window.editor.file.write(
+                `${projectInfo.project!.data.path}/project/data.js`,
+                `var data_a1e2fb4a_e986_4524_b0da_9b7ba7c0874d = \r\n${content}`,
+                'utf-8'
+            );
         }
         return true;
     });

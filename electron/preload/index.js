@@ -19,7 +19,9 @@ contextBridge.exposeInMainWorld('editor', {
     },
     file: {
         read: (path, options) => ipcRenderer.invoke('file.read', path, options),
-        readdir: path => ipcRenderer.invoke('file.readdir', path)
+        readdir: path => ipcRenderer.invoke('file.readdir', path),
+        write: (path, content, options) =>
+            ipcRenderer.invoke('file.write', path, content, options)
     },
     socket: {
         getPort: path => ipcRenderer.invoke('socket.getPort', path)

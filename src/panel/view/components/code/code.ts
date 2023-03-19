@@ -80,7 +80,7 @@ export class CodeController extends MultiController<CodeFile> {
 }
 
 // 文件类，处理文件
-export class CodeFile extends MultiItem {
+export class CodeFile extends MultiItem<string> {
     name: string;
     content: string;
     saved: Ref<boolean> = ref(true);

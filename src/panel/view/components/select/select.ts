@@ -11,6 +11,11 @@ interface SelectInfo {
 }
 
 export class SelectionController extends MultiController<Selection> {
+    constructor() {
+        super();
+        selectionList.push(this);
+    }
+
     add(content: any) {}
 
     remove(content: any) {}
@@ -31,7 +36,7 @@ export class Selection extends MultiItem {
         this.base = base;
     }
 
-    save(content: any): void {}
+    save(): void {}
 
     async parseTarget(target: string) {
         if (target === 'file') return this.parseFile();
@@ -44,3 +49,5 @@ export class Selection extends MultiItem {
         const dir = window.editor.file.readdir(this.base + '/' + path);
     }
 }
+
+export const selectionList: SelectionController[] = [];
