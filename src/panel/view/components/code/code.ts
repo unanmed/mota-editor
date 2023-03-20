@@ -9,15 +9,11 @@ const fileMap = new Map<string, CodeFile>();
 
 // 代码编辑器，处理文件列表
 export class CodeController extends MultiController<CodeFile> {
-    private static num = 0;
-
     added: boolean = false;
 
     panel?: Panel;
 
     selectStack: string[] = [];
-
-    readonly num = CodeController.num++;
 
     constructor() {
         super();
@@ -121,6 +117,11 @@ export class CodeFile extends MultiItem<string> {
         setTimeout(() => {
             this.canWatch = true;
         }, 100);
+    }
+
+    update(content: string): void {
+        this.model.setValue(content);
+        this.saved.value = true;
     }
 }
 

@@ -1,6 +1,6 @@
 <template>
-    <div class="code-root" :id="`code-root-${code.num}`">
-        <div class="code-left" :style="{ width: `${leftWidth}px` }">
+    <Multi :controller="code" @resize="editor.layout()">
+        <template #left>
             <div class="code-list unique-scroll">
                 <div
                     class="code-list-one"
@@ -24,19 +24,12 @@
                     />
                 </div>
             </div>
-        </div>
-        <div class="splitter" @mousedown="beginDrag"></div>
-        <div
-            class="code-right"
-            :id="`code-right-${code.num}`"
-            :style="{
-                width: `calc(100% - ${leftWidth + 2}px)`
-            }"
-        >
+        </template>
+        <template #right>
             <div class="code-main" :id="`code-main-${code.num}`"></div>
             <span v-if="!show" class="code-empty">Code Editor</span>
-        </div>
-    </div>
+        </template>
+    </Multi>
 </template>
 
 <script lang="ts" setup>
@@ -46,6 +39,7 @@ import * as monaco from 'monaco-editor';
 import { Registry } from 'monaco-textmate';
 import { wireTmGrammars } from 'monaco-editor-textmate';
 import { CloseOutlined } from '@ant-design/icons-vue';
+import Multi from '../multi/multi.vue';
 
 const props = defineProps<{
     code: CodeController;
@@ -53,18 +47,12 @@ const props = defineProps<{
 }>();
 
 let codeMain: HTMLDivElement;
-let codeRight: HTMLDivElement;
 let codePanel: HTMLDivElement;
 let editor: monaco.editor.IStandaloneCodeEditor;
-let model: monaco.editor.IModel;
 
 let mutation: MutationObserver;
 
 const selected = props.code.selected;
-
-const leftWidth = ref(200);
-const leftMax = 300;
-const leftMin = 100;
 
 const show = computed(() => props.code.list.length > 0);
 const file = computed(() => props.code.list[selected.value]);
@@ -74,7 +62,6 @@ function changeFile(index: number) {
     if (!file) return;
     editor.setModel(file.model);
     editor.restoreViewState(file.view ?? null);
-    model = file.model;
 }
 
 /**
@@ -148,41 +135,9 @@ function resize() {
         editor.layout();
     });
 
-    mutation.observe(codeRight, {
-        attributes: true,
-        attributeFilter: ['style']
-    });
     mutation.observe(codePanel, {
         attributes: true,
         attributeFilter: ['style']
-    });
-}
-
-let xBefore = 0;
-let leftBefore = 0;
-let dragging = false;
-
-function beginDrag(e: MouseEvent) {
-    xBefore = e.clientX;
-    leftBefore = leftWidth.value;
-    dragging = true;
-    document.addEventListener('mousemove', drag);
-}
-
-function drag(e: MouseEvent) {
-    if (!dragging) return;
-    const x = e.clientX;
-    const dx = x - xBefore;
-    let toLeft = leftBefore + dx;
-    if (toLeft < leftMin) toLeft = leftMin;
-    if (toLeft > leftMax) toLeft = leftMax;
-    leftWidth.value = toLeft;
-}
-
-function mouseup() {
-    document.removeEventListener('mousemove', drag);
-    setTimeout(() => {
-        dragging = false;
     });
 }
 
@@ -190,9 +145,7 @@ onMounted(async () => {
     codeMain = document.getElementById(
         `code-main-${props.code.num}`
     ) as HTMLDivElement;
-    codeRight = document.getElementById(
-        `code-right-${props.code.num}`
-    ) as HTMLDivElement;
+
     codePanel = document.getElementById(
         `panel-one-${props.panelNum}`
     ) as HTMLDivElement;
@@ -207,26 +160,16 @@ onMounted(async () => {
 
     resize();
 
-    document.addEventListener('mouseup', mouseup);
     props.code.added = true;
 });
 
 onUnmounted(() => {
-    document.removeEventListener('mouseup', mouseup);
     mutation.disconnect();
     props.code.added = false;
 });
 </script>
 
 <style lang="less" scoped>
-.code-root {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: row;
-}
-
 .code-list {
     display: flex;
     flex-direction: column;
@@ -253,31 +196,6 @@ onUnmounted(() => {
     align-items: center;
     z-index: 1;
     font-size: 32px;
-}
-
-.splitter {
-    height: 100%;
-    width: 2px;
-    background-color: #fff;
-    cursor: ew-resize;
-    z-index: 1;
-    transition: transform 0.2s ease;
-}
-
-.splitter:hover,
-.splitter:active {
-    transform: scaleX(300%);
-}
-
-.code-left {
-    max-width: 300px;
-    min-width: 100px;
-    width: 200px;
-}
-
-.code-right {
-    width: calc(100% - 202px);
-    position: relative;
 }
 
 .code-list-one {

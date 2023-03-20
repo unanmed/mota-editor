@@ -87,7 +87,7 @@ export class Project {
             projectInfo.title.value = this.mainData.firstData.title;
             projectInfo.version.value = this.mainData.firstData.version;
 
-            const check = (list: CodeFile[]) => {
+            const checkCode = (list: CodeFile[]) => {
                 list.forEach(v => {
                     if (!v.saved.value || !v.canWatch) return;
                     if (v.uri.scheme !== 'data') return;
@@ -96,11 +96,10 @@ export class Project {
                         content.content,
                         content.info.type as 'json' | 'code' | 'text'
                     );
-                    v.model.setValue(text);
-                    v.saved.value = true;
+                    v.update(text);
                 });
             };
-            codeList.forEach(v => check(v.list));
+            codeList.forEach(v => checkCode(v.list));
         });
     }
 }

@@ -1,4 +1,5 @@
 import { Uri } from 'monaco-editor';
+import { reactive, shallowReactive } from 'vue';
 import { MultiController, MultiItem } from '../multi/multi';
 
 interface SelectInfo {
@@ -11,21 +12,50 @@ interface SelectInfo {
 }
 
 export class SelectionController extends MultiController<Selection> {
+    selectStack: string[] = [];
+
     constructor() {
         super();
         selectionList.push(this);
     }
 
-    add(content: any) {}
+    add(content: Selection | string) {
+        if (typeof content === 'string') {
+        } else {
+            const uri = content.uri;
+            const index = this.indexOf(uri);
+            if (index === -1) {
+                this.select(this.list.push(content) - 1);
+            } else {
+                this.select(index);
+            }
+        }
+    }
 
-    remove(content: any) {}
+    remove(index: number) {
+        const select = this.list[index];
+        this.list.splice(index, 1);
+
+        this.selectStack = this.selectStack.filter(v => v !== select.uri.path);
+        if (this.selected.value === index) {
+            const index = this.indexOf(this.selectStack.pop() ?? '');
+            if (this.list[index]) this.select(index);
+        }
+    }
 
     close(): void {}
+
+    select(index: number) {}
 }
 
-export class Selection extends MultiItem {
+interface Select {
+    text: string;
+    selected: boolean;
+}
+
+export class Selection extends MultiItem<Select[]> {
     type: 'multi' | 'single' = 'single';
-    choice: any[] = [];
+    choice: Select[] = reactive([]);
     info: SelectInfo;
     base: string;
 
@@ -48,6 +78,8 @@ export class Selection extends MultiItem {
         if (!path || !suffix) return;
         const dir = window.editor.file.readdir(this.base + '/' + path);
     }
+
+    update(content: Select[]): void {}
 }
 
 export const selectionList: SelectionController[] = [];

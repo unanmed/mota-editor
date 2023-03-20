@@ -2,9 +2,13 @@ import { Uri } from 'monaco-editor';
 import { ref, Ref, shallowReactive } from 'vue';
 import { EventEmitter } from '../../../../editor/utils/event';
 
-export abstract class MultiController<Item extends MultiItem> {
+export abstract class MultiController<Item extends MultiItem = MultiItem> {
+    protected static num = 0;
+
     list: Item[] = shallowReactive([]);
     selected: Ref<number> = ref(-1);
+
+    readonly num = MultiController.num++;
 
     abstract add(content: any): any;
 
@@ -40,4 +44,6 @@ export abstract class MultiItem<Content = any, Event = {}> extends EventEmitter<
     }
 
     abstract save(content?: Content): void;
+
+    abstract update(content: Content): void;
 }
