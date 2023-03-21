@@ -27,8 +27,6 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 import { MultiController } from './multi';
 
-let root: HTMLDivElement;
-let left: HTMLDivElement;
 let right: HTMLDivElement;
 
 let mutation: MutationObserver;

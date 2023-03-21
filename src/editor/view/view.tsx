@@ -5,7 +5,9 @@ import {
 } from '../../panel/view/components/table/table';
 import { PanelProps, PanelType } from './panel';
 import Code from '../../panel/view/components/code/code.vue';
+import Select from '../../panel/view/components/select/select.vue';
 import { CodeController } from '../../panel/view/components/code/code';
+import { SelectionController } from '../../panel/view/components/select/select';
 
 interface PanelViewProps<T extends PanelType> {
     type: T;
@@ -30,6 +32,8 @@ export function Panel<T extends PanelType>(props: PanelViewProps<T>) {
         );
     } else if (type === 'code') {
         return <Code code={p as CodeController} panelNum={props.num}></Code>;
+    } else if (type === 'select') {
+        return <Select selection={p as SelectionController}></Select>;
     }
     return <div></div>;
 }

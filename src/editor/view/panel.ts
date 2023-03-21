@@ -1,13 +1,15 @@
 import { ref, Ref } from 'vue';
 import { CodeController } from '../../panel/view/components/code/code';
+import { SelectionController } from '../../panel/view/components/select/select';
 import { TableProps } from '../../panel/view/components/table/table';
 import { view } from './control';
 
-export type PanelType = 'table' | 'code';
+export type PanelType = keyof PanelProps;
 
 export interface PanelProps {
     table: TableProps;
     code: CodeController;
+    select: SelectionController;
 }
 
 export class Panel<T extends PanelType = PanelType> {

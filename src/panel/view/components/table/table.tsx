@@ -2,13 +2,25 @@ import { Button } from 'ant-design-vue';
 import { Uri } from 'monaco-editor';
 import { projectInfo } from '../../../../editor/project/project';
 import { view } from '../../../../editor/view/control';
-import { addCode, showCode, tables } from '../../control';
+import {
+    addCode,
+    addSelection,
+    showCode,
+    showSelection,
+    tables
+} from '../../control';
 import {
     CodeController,
     CodeFile,
     codeList,
     createCodeFile
 } from '../code/code';
+import {
+    SelectInfo,
+    Selection,
+    SelectionController,
+    selectionList
+} from '../select/select';
 import Table from './table.vue';
 
 export interface TableElement {
@@ -45,6 +57,10 @@ export function TableRenderer(props: TableProps) {
         );
     } else {
         const edit = () => {
+            const uri = new Uri().with({
+                path: `${props.path}${props.path ? '.' : ''}${props.keys}`,
+                scheme: props.root
+            });
             if (
                 data.type === 'code' ||
                 data.type === 'text' ||
@@ -53,16 +69,26 @@ export function TableRenderer(props: TableProps) {
                 const lang = data.type === 'code' ? 'javascript' : data.type;
                 const editor = codeList[0] ?? addCode();
                 if (!editor) return;
-                const uri = new Uri().with({
-                    path: `${props.path}${props.path ? '.' : ''}${props.keys}`,
-                    scheme: props.root
-                });
+
                 const content = getTableValue(uri, data.type);
                 const file = createCodeFile(data.text, content, lang, uri);
                 editor.add(file);
                 onTableSave(file, data.type);
 
                 if (!editor.added) tryShowCode(editor);
+            } else if (data.type === 'select') {
+                const select = selectionList[0] ?? addSelection();
+                if (!select) return;
+                const content = getTableObject<string[]>(uri);
+                const selection = new Selection(
+                    content.info as SelectInfo,
+                    content.content,
+                    projectInfo.project!.data.path,
+                    uri
+                );
+                select.add(selection);
+
+                if (!select.added) tryShowSelection(select);
             }
         };
         return (
@@ -79,7 +105,14 @@ export function TableRenderer(props: TableProps) {
     }
 }
 
-export function getTableObject(uri: Uri, data?: any) {
+interface TableObject<T = any> {
+    root: any;
+    content: T;
+    info: TableElement;
+    lastKey: string;
+}
+
+export function getTableObject<T = any>(uri: Uri, data?: any): TableObject<T> {
     const stack = uri.path.split('.');
     const datas = data || {
         data: projectInfo.project!.mainData
@@ -136,4 +169,10 @@ function tryShowCode(editor: CodeController) {
     const panel = view.list.find(v => v.type === 'code');
     panel?.close();
     showCode(editor);
+}
+
+function tryShowSelection(selection: SelectionController) {
+    const panel = view.list.find(v => v.type === 'select');
+    panel?.close();
+    showSelection(selection);
 }

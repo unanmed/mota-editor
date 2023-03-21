@@ -1,12 +1,16 @@
 import { Uri } from 'monaco-editor';
 import { ref, Ref, shallowReactive } from 'vue';
 import { EventEmitter } from '../../../../editor/utils/event';
+import { Panel } from '../../../../editor/view/panel';
 
 export abstract class MultiController<Item extends MultiItem = MultiItem> {
     protected static num = 0;
 
     list: Item[] = shallowReactive([]);
     selected: Ref<number> = ref(-1);
+
+    panel?: Panel;
+    added: boolean = false;
 
     readonly num = MultiController.num++;
 

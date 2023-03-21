@@ -34,7 +34,7 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
-import { CodeFile, CodeController } from './code';
+import { CodeController } from './code';
 import * as monaco from 'monaco-editor';
 import { Registry } from 'monaco-textmate';
 import { wireTmGrammars } from 'monaco-editor-textmate';
@@ -174,7 +174,6 @@ onUnmounted(() => {
     display: flex;
     flex-direction: column;
     width: 100%;
-    overflow: hidden scroll;
     height: 100%;
     padding: 8px 2px;
 }

@@ -11,8 +11,6 @@ const fileMap = new Map<string, CodeFile>();
 export class CodeController extends MultiController<CodeFile> {
     added: boolean = false;
 
-    panel?: Panel;
-
     selectStack: string[] = [];
 
     constructor() {

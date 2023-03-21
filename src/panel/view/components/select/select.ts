@@ -2,9 +2,10 @@ import { Uri } from 'monaco-editor';
 import { reactive, shallowReactive } from 'vue';
 import { MultiController, MultiItem } from '../multi/multi';
 
-interface SelectInfo {
+export interface SelectInfo {
     type: 'select';
     text: string;
+    doc: string[];
     target: string;
     multi?: boolean;
     suffix?: string[];
@@ -19,9 +20,9 @@ export class SelectionController extends MultiController<Selection> {
         selectionList.push(this);
     }
 
-    add(content: Selection | string) {
+    add(content: Selection | string | Uri) {
         if (typeof content === 'string') {
-        } else {
+        } else if (content instanceof Selection) {
             const uri = content.uri;
             const index = this.indexOf(uri);
             if (index === -1) {
@@ -29,6 +30,7 @@ export class SelectionController extends MultiController<Selection> {
             } else {
                 this.select(index);
             }
+        } else {
         }
     }
 
@@ -45,12 +47,19 @@ export class SelectionController extends MultiController<Selection> {
 
     close(): void {}
 
-    select(index: number) {}
+    select(index: number) {
+        this.selected.value = index;
+    }
 }
 
-interface Select {
+export interface Select {
     text: string;
     selected: boolean;
+}
+
+export interface FiledSelectSuffix {
+    fn: string;
+    params: any[];
 }
 
 export class Selection extends MultiItem<Select[]> {
@@ -59,11 +68,34 @@ export class Selection extends MultiItem<Select[]> {
     info: SelectInfo;
     base: string;
 
-    constructor(info: SelectInfo, base: string, uri: Uri) {
+    private _defaultAll: boolean = false;
+    canDefaultAll?: boolean = true;
+
+    get defaultAll(): boolean {
+        return this._defaultAll;
+    }
+    set defaultAll(v: boolean) {
+        if (!this.canDefaultAll) this._defaultAll = false;
+        this._defaultAll = v;
+    }
+
+    name: string;
+    suffix: Record<string, FiledSelectSuffix[]> = {};
+
+    constructor(info: SelectInfo, selected: string[], base: string, uri: Uri) {
         super(uri);
         this.type = info.multi ? 'multi' : 'single';
         this.info = info;
         this.base = base;
+        this.name = info.text;
+        this.parseTarget(info.target).then(() => {
+            selected.forEach(v => {
+                const index = this.choice.findIndex(vv => vv.text === v);
+                if (index !== -1) {
+                    this.choice[index].selected = true;
+                }
+            });
+        });
     }
 
     save(): void {}
@@ -76,10 +108,60 @@ export class Selection extends MultiItem<Select[]> {
         const path = this.info.path;
         const suffix = this.info.suffix;
         if (!path || !suffix) return;
-        const dir = window.editor.file.readdir(this.base + '/' + path);
+        this.parseSuffix();
+        const dir = await window.editor.file.readdir(this.base + '/' + path);
+        const list: Select[] = [];
+        for await (const file of dir) {
+            const isFile = await window.editor.file.isFile(
+                `${this.base}/${path}/${file}`
+            );
+
+            if (!isFile) continue;
+            list.push(
+                reactive({
+                    text: file,
+                    selected: false
+                })
+            );
+        }
+
+        this.choice.splice(0);
+        this.choice.push(...list);
     }
 
     update(content: Select[]): void {}
+
+    private parseSuffix() {
+        if (!this.info.suffix) return;
+        this.info.suffix.forEach(v => {
+            const dot = v.indexOf('.');
+            const func = v.slice(dot);
+            const fns = func.split('.').slice(1);
+            const list: FiledSelectSuffix[] = [];
+            fns.forEach(v => {
+                const match = v.match(/\(.*\)$/g);
+                if (!match) {
+                    list.push({
+                        fn: v,
+                        params: []
+                    });
+                } else {
+                    const fn = v.replace(match[0], '');
+                    if (fn === 'uncancelable') this.canDefaultAll = false;
+                    list.push({
+                        fn: fn,
+                        params: match[0]
+                            .slice(1, -1)
+                            .split(',')
+                            .map(v => v.trim())
+                            .filter(v => !!v)
+                    });
+                }
+            });
+            const s = dot === -1 ? v : v.slice(0, dot);
+            this.suffix[s] = list;
+        });
+    }
 }
 
 export const selectionList: SelectionController[] = [];

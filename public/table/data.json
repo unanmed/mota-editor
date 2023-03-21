@@ -29,19 +29,20 @@
                         "在此存放所有可能使用的图片（tilesets除外）。图片可以被作为背景图（的一部分），",
                         "也可以直接用自定义事件进行显示。 图片名不能使用中文，不能带空格或特殊字符；",
                         "可以直接改名拼音就好。建议对于较大的图片，",
-                        "在网上使用在线的“图片压缩工具(http://compresspng.com/zh/)”来进行压缩，以节省流量"
+                        "在网上使用在线的<a href=\"http://compresspng.com/zh/\" target=\"_blank\">图片压缩工具</a>",
+                        "来进行压缩，以节省流量"
                     ],
                     "target": "file",
                     "multi": true,
                     "suffix": [
-                        "jpg",
-                        "png",
-                        "jpeg",
-                        "gif"
+                        "jpg.previewImage()",
+                        "png.previewImage()",
+                        "jpeg.previewImage()",
+                        "gif.previewImage()"
                     ],
                     "path": "project/images/"
                 },
-                "titlesets": {
+                "tilesets": {
                     "type": "select",
                     "text": "额外素材",
                     "doc": [
@@ -52,7 +53,7 @@
                     "target": "file",
                     "multi": true,
                     "suffix": [
-                        "png.uncancelable()"
+                        "png.uncancelable().previewImage()"
                     ],
                     "path": "project/tilesets/"
                 },
@@ -88,7 +89,7 @@
                 },
                 "sounds": {
                     "type": "select",
-                    "text": "使用音乐",
+                    "text": "使用音效",
                     "doc": [
                         "在此存放所有的SE，和文件名一致。音频名不能使用中文，不能带空格或特殊字符；可以直接改名拼音就好"
                     ],
@@ -96,7 +97,7 @@
                     "multi": true,
                     "suffix": [
                         "mp3",
-                        "ogg.warn('IOS或MAC上无法播放!')",
+                        "ogg.warn(> IOS或MAC上无法播放! <)",
                         "wav",
                         "flac"
                     ],

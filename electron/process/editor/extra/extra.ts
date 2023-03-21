@@ -1,5 +1,5 @@
 import { app, ipcMain } from 'electron';
-import { readdir, readFile, writeFile } from 'fs/promises';
+import { readdir, readFile, stat, writeFile } from 'fs/promises';
 import { resolve } from 'path';
 
 const root = app.getAppPath();
@@ -19,5 +19,8 @@ export function injectExtraInterface() {
     ipcMain.handle('file.readdir', (e, path) => readdir(path));
     ipcMain.handle('file.write', (e, path, content, options) =>
         writeFile(path, content, options)
+    );
+    ipcMain.handle('file.isFile', async (e, path) =>
+        (await stat(path)).isFile()
     );
 }
