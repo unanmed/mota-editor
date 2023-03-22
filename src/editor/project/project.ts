@@ -1,5 +1,8 @@
 import { ref, Ref } from 'vue';
-import type { MotaProjectData } from '../../../electron/process/editor/project/project';
+import type {
+    MotaProjectData,
+    ProjectInfo as Info
+} from '../../../electron/process/editor/project/project';
 import {
     CodeFile,
     codeList,
@@ -26,9 +29,11 @@ export class Project {
     data: MotaProjectData;
     /** 全塔属性 */
     mainData: DataCore;
+    info: Info;
 
     constructor(data: MotaProjectData) {
         this.data = data;
+        this.info = data.info;
         const mainData = data.mainInfo[0];
         this.mainData = this.parseJSONEDMotaData(mainData.content);
         this.name = this.mainData.firstData.name;
@@ -63,6 +68,8 @@ export class Project {
     setupSocket() {
         this.socket.on('change', (data, e) => this.handleChange(data));
     }
+
+    setInfo() {}
 
     private parseJSONEDMotaData(content: string) {
         return JSON.parse(

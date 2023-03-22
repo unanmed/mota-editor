@@ -81,7 +81,7 @@
                     "multi": true,
                     "suffix": [
                         "mp3",
-                        "ogg.warn('IOS或MAC上无法播放!')",
+                        "ogg.warn('IOS或MAC上无法播放!').transform(ogg, mp3)",
                         "wav",
                         "flac"
                     ],
@@ -97,7 +97,7 @@
                     "multi": true,
                     "suffix": [
                         "mp3",
-                        "ogg.warn(> IOS或MAC上无法播放! <)",
+                        "ogg.warn(> IOS或MAC上无法播放! <).transform(ogg, mp3)",
                         "wav",
                         "flac"
                     ],

@@ -26,8 +26,6 @@ type BooleanEnemyProperty =
 
 type DetailedEnemy<I extends EnemyIds = EnemyIds> = {
     specialText: string[];
-    toShowSpecial: string[];
-    toShowColor: Color[];
     specialColor: Color[];
     damageColor: Color;
     criticalDamage: number;

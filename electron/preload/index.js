@@ -12,7 +12,8 @@ contextBridge.exposeInMainWorld('editor', {
         selectFolder: path => ipcRenderer.invoke('project.selectFolder', path),
         close: path => ipcRenderer.invoke('project.close', path),
         getRecent: () => ipcRenderer.invoke('project.recent'),
-        sendProjectInfo: path => ipcRenderer.send('projectInfo', path)
+        sendProjectInfo: path => ipcRenderer.send('projectInfo', path),
+        setInfo: info => ipcRenderer.invoke('project.setInfo', info)
     },
     extra: {
         get: (path, encoding) => ipcRenderer.invoke('extra.get', path, encoding)

@@ -166,6 +166,7 @@ onMounted(async () => {
 onUnmounted(() => {
     mutation.disconnect();
     props.code.added = false;
+    props.code.list.splice(0);
 });
 </script>
 

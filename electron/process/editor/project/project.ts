@@ -54,7 +54,13 @@ export interface MotaProjectData {
     structure: Structure;
     path: string;
     extensions: FileData[];
+    info: ProjectInfo;
     readonly?: boolean;
+}
+
+export interface ProjectInfo {
+    name: string;
+    defaultAll?: string[];
 }
 
 export const projectList: MotaProject[] = [];
@@ -65,7 +71,7 @@ export class MotaProject {
     /** 项目名称 */
     name!: string;
     /** 项目信息 */
-    info: any;
+    info!: ProjectInfo;
     /** 当前目录是否合法 */
     valid: boolean = true;
 
@@ -80,9 +86,6 @@ export class MotaProject {
             (async () => {
                 if (!(await this.test())) {
                     this.valid = false;
-                } else {
-                    this.info = await this.getProjectInfo();
-                    this.name = this.info.name;
                 }
                 res();
             })();
@@ -208,6 +211,9 @@ export class MotaProject {
                 .join('')
         );
 
+        this.info = await this.getProjectInfo();
+        this.name = this.info.name;
+
         const project: MotaProjectData = {
             floors,
             images,
@@ -225,7 +231,8 @@ export class MotaProject {
             structure,
             path: this.dir,
             extensions,
-            readonly: false
+            readonly: false,
+            info: this.info
         };
 
         console.log(`open project ${this.name} success.`);
@@ -277,7 +284,7 @@ export class MotaProject {
     /**
      * 获取项目信息
      */
-    async getProjectInfo() {
+    async getProjectInfo(): Promise<ProjectInfo> {
         try {
             const proj = await fs.readFile(
                 resolve(this.dir, 'project.h5proj'),
@@ -285,7 +292,7 @@ export class MotaProject {
             );
             return JSON.parse(proj);
         } catch {
-            const name = this.dir.split(/(\/|\\)/).at(-1);
+            const name = this.mainData.firstData.name;
             await fs.writeFile(
                 resolve(this.dir, 'project.h5proj'),
                 JSON.stringify({ name }),
@@ -295,9 +302,15 @@ export class MotaProject {
         }
     }
 
-    async save(info: string, content: string) {
+    async save(info: string, content: any) {
         if (info === 'data') {
             await fs.writeFile(`${this.dir}/project/data.js`, content, 'utf-8');
+        } else if (info === 'project') {
+            await fs.writeFile(
+                `${this.dir}/project.h5proj`,
+                JSON.stringify(content, void 0, 4),
+                'utf-8'
+            );
         }
     }
 

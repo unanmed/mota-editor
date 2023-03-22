@@ -1,4 +1,7 @@
-import { MotaProjectData } from '../../../electron/process/editor/project/project';
+import {
+    MotaProjectData,
+    ProjectInfo
+} from '../../../electron/process/editor/project/project';
 
 interface ProjectHandler {
     /**
@@ -32,4 +35,6 @@ interface ProjectHandler {
      * 向主进程发送当前窗口的项目信息
      */
     sendProjectInfo(path: string): Promise<void>;
+
+    setInfo(info: ProjectInfo): Promise<void>;
 }

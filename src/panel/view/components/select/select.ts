@@ -1,5 +1,6 @@
 import { Uri } from 'monaco-editor';
-import { reactive, shallowReactive } from 'vue';
+import { reactive, ref, Ref, shallowReactive } from 'vue';
+import { projectInfo } from '../../../../editor/project/project';
 import { MultiController, MultiItem } from '../multi/multi';
 
 export interface SelectInfo {
@@ -45,7 +46,11 @@ export class SelectionController extends MultiController<Selection> {
         }
     }
 
-    close(): void {}
+    close(): void {
+        const index = selectionList.indexOf(this);
+        if (index === -1 || index === 0) return;
+        selectionList.splice(index, 1);
+    }
 
     select(index: number) {
         this.selected.value = index;
@@ -68,16 +73,8 @@ export class Selection extends MultiItem<Select[]> {
     info: SelectInfo;
     base: string;
 
-    private _defaultAll: boolean = false;
+    defaultAll: Ref<boolean> = ref(false);
     canDefaultAll?: boolean = true;
-
-    get defaultAll(): boolean {
-        return this._defaultAll;
-    }
-    set defaultAll(v: boolean) {
-        if (!this.canDefaultAll) this._defaultAll = false;
-        this._defaultAll = v;
-    }
 
     name: string;
     suffix: Record<string, FiledSelectSuffix[]> = {};
@@ -88,6 +85,8 @@ export class Selection extends MultiItem<Select[]> {
         this.info = info;
         this.base = base;
         this.name = info.text;
+        this.defaultAll.value =
+            !!projectInfo.project!.info.defaultAll?.includes(uri.toString());
         this.parseTarget(info.target).then(() => {
             selected.forEach(v => {
                 const index = this.choice.findIndex(vv => vv.text === v);
@@ -112,6 +111,7 @@ export class Selection extends MultiItem<Select[]> {
         const dir = await window.editor.file.readdir(this.base + '/' + path);
         const list: Select[] = [];
         for await (const file of dir) {
+            if (!isValidName(file)) continue;
             const isFile = await window.editor.file.isFile(
                 `${this.base}/${path}/${file}`
             );
@@ -165,3 +165,21 @@ export class Selection extends MultiItem<Select[]> {
 }
 
 export const selectionList: SelectionController[] = [];
+
+export function isValidName(name: string) {
+    return /^[-\w_\.]+$/i.test(name);
+}
+
+export function changeDefaultAll(select: Selection) {
+    const enabled = select.defaultAll;
+    const info = projectInfo.project!.info;
+    info.defaultAll ??= [];
+    const uri = select.uri.toString();
+    if (enabled) {
+        if (!info.defaultAll.includes(uri)) info.defaultAll.push(uri);
+    } else {
+        const index = info.defaultAll.indexOf(uri);
+        if (index !== -1) info.defaultAll.splice(index, 1);
+    }
+    window.editor.project.setInfo(info);
+}

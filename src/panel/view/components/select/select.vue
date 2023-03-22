@@ -20,22 +20,34 @@
         </template>
         <template #right>
             <span v-if="!show" class="select-empty">Selection Editor</span>
-            <div v-else class="select-main unique-scroll">
+            <div
+                v-else-if="select.info.multi"
+                class="select-main unique-scroll"
+            >
                 <span
                     class="select-doc"
                     v-html="parseDoc(select.info.doc)"
                 ></span>
+                <span class="select-doc" v-if="select.info.target === 'file'">
+                    <a-divider class="divider"></a-divider>
+                    注：默认全选是指当对应文件夹的内容改变时，是否将增加的内容直接选中。
+                    例如当图片文件夹中新增了一个123.png时，如果勾上了默认全选，那么编辑器将会自动选中该文件。
+                    此选项仅在编辑器开启的情况下有效。
+                </span>
                 <a-divider class="divider"></a-divider>
                 <div class="select-data">
                     <div class="select-all">
                         <a-checkbox
                             :checked="checkAll"
                             :indeterminate="indeterminate"
+                            @change="triggerAll()"
                             >全选</a-checkbox
                         >
                         <a-checkbox
+                            v-if="select.info.target === 'file'"
                             :disabled="cannotDefaultAll"
-                            :checked="select.defaultAll"
+                            :checked="select.defaultAll.value"
+                            @change="setDefaultAll"
                             >默认全选</a-checkbox
                         >
                     </div>
@@ -45,6 +57,7 @@
                             <a-checkbox
                                 v-model:checked="select.root.selected"
                                 :disabled="!!select.disabled"
+                                @change="checkDefaultAll"
                             >
                                 {{ select.text }}
                                 <span v-if="select.warn" class="select-warn">{{
@@ -60,9 +73,14 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, onUnmounted, ref } from 'vue';
 import Multi from '../multi/multi.vue';
-import { FiledSelectSuffix, Select, SelectionController } from './select';
+import {
+    FiledSelectSuffix,
+    Select,
+    SelectionController,
+    changeDefaultAll
+} from './select';
 import { CloseOutlined } from '@ant-design/icons-vue';
 import { parseDoc } from '../../../../editor/utils/utils';
 
@@ -85,7 +103,7 @@ const checkAll = computed(() => {
     return !!select.value?.choice.every(v => v.selected);
 });
 const indeterminate = computed(
-    () => !!select.value?.choice.some(v => v.selected)
+    () => !!select.value?.choice.some(v => v.selected) && !checkAll.value
 );
 
 const cannotDefaultAll = computed(() => !select.value?.canDefaultAll);
@@ -127,6 +145,31 @@ function applyDecorator(
 
     return data;
 }
+
+function setDefaultAll(value: boolean = !select.value.defaultAll.value) {
+    if (select.value.canDefaultAll) {
+        select.value.defaultAll.value = value;
+        if (select.value.defaultAll.value) {
+            triggerAll(true);
+        }
+    } else {
+        select.value.defaultAll.value = false;
+    }
+    changeDefaultAll(select.value);
+}
+
+function triggerAll(value: boolean = !checkAll.value) {
+    select.value.choice.forEach(v => (v.selected = value));
+}
+
+function checkDefaultAll() {
+    if (!checkAll.value) setDefaultAll(false);
+}
+
+onUnmounted(() => {
+    props.selection.added = false;
+    props.selection.list.splice(0);
+});
 </script>
 
 <style lang="less" scoped>

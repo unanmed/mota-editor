@@ -9,8 +9,6 @@ const fileMap = new Map<string, CodeFile>();
 
 // 代码编辑器，处理文件列表
 export class CodeController extends MultiController<CodeFile> {
-    added: boolean = false;
-
     selectStack: string[] = [];
 
     constructor() {
