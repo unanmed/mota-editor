@@ -47,22 +47,24 @@
                             v-if="select.info.target === 'file'"
                             :disabled="cannotDefaultAll"
                             :checked="select.defaultAll.value"
-                            @change="setDefaultAll"
+                            @change="setDefaultAll()"
                             >默认全选</a-checkbox
                         >
                     </div>
                     <a-divider class="divider"></a-divider>
                     <div class="select-selection">
-                        <div v-for="(select, i) in selectList">
+                        <div v-for="(selection, i) in selectList">
                             <a-checkbox
-                                v-model:checked="select.root.selected"
-                                :disabled="!!select.disabled"
+                                v-model:checked="selection.root.selected"
+                                :disabled="!!selection.disabled"
                                 @change="save(true)"
                             >
-                                {{ select.text }}
-                                <span v-if="select.warn" class="select-warn">{{
-                                    select.warn
-                                }}</span>
+                                {{ selection.text }}
+                                <span
+                                    v-if="selection.warn"
+                                    class="select-warn"
+                                    >{{ selection.warn }}</span
+                                >
                             </a-checkbox>
                         </div>
                     </div>

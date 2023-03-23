@@ -65,11 +65,8 @@ export class Panel<T extends PanelType = PanelType> {
             if (v === this) index = i;
         });
         this.focused.value = true;
+        this.zIndex.value = 1;
         if (this.toped) this.zIndex.value = 10;
-        if (index !== -1) {
-            view.list.splice(index, 1);
-            view.list.push(this);
-        }
         return this;
     }
 

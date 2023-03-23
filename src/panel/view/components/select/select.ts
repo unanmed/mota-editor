@@ -92,11 +92,6 @@ export class Selection extends MultiItem<Select[]> {
         this.parseTarget(info.target).then(() => {
             selected.forEach(v => {
                 const index = this.choice.findIndex(vv => {
-                    if (info.target !== 'file') return vv.text === v;
-                    const suffix = vv.text.split('.').at(-1);
-                    if (!suffix) return vv.text === v;
-                    const hide = this.suffix[suffix].some(v => v.fn === 'hide');
-                    if (hide) return vv.text.replace(`.${suffix}`, '') === v;
                     return vv.text === v;
                 });
                 if (index !== -1) {
@@ -133,11 +128,18 @@ export class Selection extends MultiItem<Select[]> {
             const isFile = await window.editor.file.isFile(
                 `${this.base}/${path}/${file}`
             );
+            const suffix = file.split('.').at(-1);
+            let text = file;
+            if (suffix) {
+                if (this.suffix[suffix].some(v => v.fn === 'hide')) {
+                    text = file.replace(`.${suffix}`, '');
+                }
+            }
 
             if (!isFile) continue;
             list.push(
                 reactive({
-                    text: file,
+                    text,
                     selected: false
                 })
             );
