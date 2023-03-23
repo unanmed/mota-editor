@@ -114,7 +114,10 @@ export class Project extends EventEmitter<ProjectEvent> {
     private handleChange(data: WebSocketMessageData['change']) {
         // 全塔属性
         if (/project(\/|\\)+data.js/.test(data.file)) {
-            this.emit('mainDataChange', this.mainData);
+            this.emit(
+                'mainDataChange',
+                this.parseJSONEDMotaData(data.content.data as string)
+            );
         }
     }
 
