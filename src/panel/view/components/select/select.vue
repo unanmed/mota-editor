@@ -57,7 +57,7 @@
                             <a-checkbox
                                 v-model:checked="select.root.selected"
                                 :disabled="!!select.disabled"
-                                @change="checkDefaultAll"
+                                @change="save(true)"
                             >
                                 {{ select.text }}
                                 <span v-if="select.warn" class="select-warn">{{
@@ -73,7 +73,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onUnmounted, ref } from 'vue';
+import { computed, nextTick, onUnmounted, ref } from 'vue';
 import Multi from '../multi/multi.vue';
 import {
     FiledSelectSuffix,
@@ -159,11 +159,21 @@ function setDefaultAll(value: boolean = !select.value.defaultAll.value) {
 }
 
 function triggerAll(value: boolean = !checkAll.value) {
-    select.value.choice.forEach(v => (v.selected = value));
+    select.value.choice.forEach((v, i) => {
+        if (!selectList.value[i].disabled) v.selected = value;
+    });
+    nextTick(() => {
+        save(true);
+    });
 }
 
 function checkDefaultAll() {
     if (!checkAll.value) setDefaultAll(false);
+}
+
+function save(check?: boolean) {
+    if (check) checkDefaultAll();
+    select.value.save();
 }
 
 onUnmounted(() => {
@@ -248,7 +258,7 @@ onUnmounted(() => {
     padding: 0 32px;
 }
 
-.select-main ::v-deep .ant-checkbox + span {
+.select-main :v-deep(.ant-checkbox + span) {
     font-size: 16px;
 }
 

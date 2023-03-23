@@ -15,7 +15,9 @@ import {
     codeList,
     createCodeFile
 } from '../code/code';
+import { MultiItem } from '../multi/multi';
 import {
+    Select,
     SelectInfo,
     Selection,
     SelectionController,
@@ -87,6 +89,7 @@ export function TableRenderer(props: TableProps) {
                     uri
                 );
                 select.add(selection);
+                onTableSave(selection, 'select');
 
                 if (!select.added) tryShowSelection(select);
             }
@@ -135,18 +138,18 @@ export function getTableObject<T = any>(uri: Uri, data?: any): TableObject<T> {
     };
 }
 
-function getTableValue(uri: Uri, type: 'code' | 'text' | 'json' = 'code') {
+function getTableValue(uri: Uri, type: TableElement['type'] = 'code') {
     const { content } = getTableObject(uri);
     if (type === 'json') return JSON.stringify(content, void 0, 4);
     else return content;
 }
 
-function onTableSave(file: CodeFile, type: 'code' | 'text' | 'json' = 'code') {
+function onTableSave(file: MultiItem, type: TableElement['type'] = 'code') {
     const { root, lastKey: key } = getTableObject(file.uri);
-    file.on('save', async (content: string) => {
+    file.on('save', async (content: any) => {
         // 对表格数据赋值
-        if (type === 'json') root[key] = JSON.parse(content);
-        else root[key] = content;
+        root[key] = getParsedData(content, type);
+
         const scheme = file.uri.scheme;
         // 保存至本地文件
         if (scheme === 'data') {
@@ -163,6 +166,16 @@ function onTableSave(file: CodeFile, type: 'code' | 'text' | 'json' = 'code') {
         }
         return true;
     });
+}
+
+function getParsedData(data: any, type: TableElement['type']) {
+    if (type === 'json') {
+        return JSON.parse(data);
+    } else if (type === 'select') {
+        return (data as Select[]).filter(v => v.selected).map(v => v.text);
+    } else {
+        return data;
+    }
 }
 
 function tryShowCode(editor: CodeController) {

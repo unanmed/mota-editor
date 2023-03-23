@@ -79,6 +79,8 @@ export class Selection extends MultiItem<Select[]> {
     name: string;
     suffix: Record<string, FiledSelectSuffix[]> = {};
 
+    canWatch: boolean = true;
+
     constructor(info: SelectInfo, selected: string[], base: string, uri: Uri) {
         super(uri);
         this.type = info.multi ? 'multi' : 'single';
@@ -89,7 +91,14 @@ export class Selection extends MultiItem<Select[]> {
             !!projectInfo.project!.info.defaultAll?.includes(uri.toString());
         this.parseTarget(info.target).then(() => {
             selected.forEach(v => {
-                const index = this.choice.findIndex(vv => vv.text === v);
+                const index = this.choice.findIndex(vv => {
+                    if (info.target !== 'file') return vv.text === v;
+                    const suffix = vv.text.split('.').at(-1);
+                    if (!suffix) return vv.text === v;
+                    const hide = this.suffix[suffix].some(v => v.fn === 'hide');
+                    if (hide) return vv.text.replace(`.${suffix}`, '') === v;
+                    return vv.text === v;
+                });
                 if (index !== -1) {
                     this.choice[index].selected = true;
                 }
@@ -97,7 +106,16 @@ export class Selection extends MultiItem<Select[]> {
         });
     }
 
-    save(): void {}
+    async save() {
+        this.canWatch = false;
+        let success = false;
+        for await (const fn of this.event.save!) {
+            if (!(await fn(this.choice))) success = false;
+        }
+        setTimeout(() => {
+            this.canWatch = true;
+        }, 100);
+    }
 
     async parseTarget(target: string) {
         if (target === 'file') return this.parseFile();
