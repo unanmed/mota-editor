@@ -142,14 +142,19 @@ export class Selection extends MultiItem<Select[]> {
     update(content: Select[]): void {}
 
     updateSelected(selected: string[]) {
-        selected.forEach(v => {
-            const index = this.choice.findIndex(vv => {
-                return vv.text === v;
+        if (this.defaultAll.value) {
+            this.choice.forEach(v => (v.selected = true));
+        } else {
+            selected.forEach(v => {
+                const index = this.choice.findIndex(vv => {
+                    return vv.text === v;
+                });
+                if (index !== -1) {
+                    this.choice[index].selected = true;
+                }
             });
-            if (index !== -1) {
-                this.choice[index].selected = true;
-            }
-        });
+        }
+        this.save();
     }
 
     private parseSuffix() {
@@ -192,10 +197,11 @@ export function isValidName(name: string) {
 }
 
 export function changeDefaultAll(select: Selection) {
-    const enabled = select.defaultAll;
+    const enabled = select.defaultAll.value;
     const info = projectInfo.project!.info;
     info.defaultAll ??= [];
     const uri = select.uri.toString();
+
     if (enabled) {
         if (!info.defaultAll.includes(uri)) info.defaultAll.push(uri);
     } else {

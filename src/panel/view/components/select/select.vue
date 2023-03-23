@@ -55,6 +55,7 @@
                     <div class="select-selection">
                         <div v-for="(selection, i) in selectList">
                             <a-checkbox
+                                :key="selection.text"
                                 v-model:checked="selection.root.selected"
                                 :disabled="!!selection.disabled"
                                 @change="save(true)"
@@ -260,7 +261,7 @@ onUnmounted(() => {
     padding: 0 32px;
 }
 
-.select-main :v-deep(.ant-checkbox + span) {
+.select-main :deep(.ant-checkbox + span) {
     font-size: 16px;
 }
 

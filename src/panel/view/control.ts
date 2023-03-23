@@ -1,19 +1,9 @@
 import { view } from '../../editor/view/control';
-import { projectInfo } from '../../editor/project/project';
+import { projectInfo, tables } from '../../editor/project/project';
 import { Panel } from '../../editor/view/panel';
 import { TableElement } from './components/table/table';
-import { CodeFile, CodeController } from './components/code/code';
+import { CodeController } from './components/code/code';
 import { SelectionController } from './components/select/select';
-
-export const tables: Record<string, TableElement> = {};
-
-(async function () {
-    const data = (await window.editor.extra.get(
-        'table/data.json',
-        'utf-8'
-    )) as string;
-    tables.data = JSON.parse(data);
-})();
 
 export function addData() {
     if (!projectInfo.project) return alert('请先打开一个魔塔项目');

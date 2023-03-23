@@ -1,4 +1,5 @@
-import { reactive, ref, Ref } from 'vue';
+import { Uri } from 'monaco-editor';
+import { ref, Ref } from 'vue';
 import type {
     MotaProjectData,
     ProjectInfo as Info
@@ -8,20 +9,46 @@ import {
     codeList,
     getFormatedString
 } from '../../panel/view/components/code/code';
-import { MultiItem } from '../../panel/view/components/multi/multi';
 import {
     Selection,
     selectionList
 } from '../../panel/view/components/select/select';
 import {
     getTableObject,
-    TableObject
+    TableElement
 } from '../../panel/view/components/table/table';
 import { EventEmitter } from '../utils/event';
 import { SocketHandler, WebSocketMessageData } from './socket';
 
+export const tables: Record<string, TableElement> = {};
+const watchFolders: Record<string, string> = {};
+
+(async function () {
+    const data = (await window.editor.extra.get(
+        'table/data.json',
+        'utf-8'
+    )) as string;
+    tables.data = JSON.parse(data);
+})().then(() => {
+    const parse = (key: string, data: TableElement, scheme: string) => {
+        if (data.type === 'object') {
+            for (const [k, value] of Object.entries<TableElement>(data.data)) {
+                parse(`${key}.${k}`, value, scheme);
+            }
+            return;
+        }
+
+        if (data.type === 'select' && data.target === 'file') {
+            const uri = new Uri().with({ scheme, path: key });
+            watchFolders[data.path] = uri.toString();
+        }
+    };
+    parse('data', tables.data, 'data');
+});
+
 interface ProjectEvent {
     mainDataChange: (data: DataCore) => void;
+    fileChange: (path: string, uri: string) => void;
 }
 
 export class Project extends EventEmitter<ProjectEvent> {
@@ -61,13 +88,16 @@ export class Project extends EventEmitter<ProjectEvent> {
     }
 
     setup() {
-        this.watchTableChange();
+        this.onTableChange();
+        this.onFileChange();
     }
 
     close() {}
 
     setupSocket() {
         this.socket.on('change', (data, e) => this.handleChange(data));
+        this.socket.on('add', (data, e) => this.handleAdd(data));
+        this.socket.on('remove', (data, e) => this.handleRemove(data));
     }
 
     setInfo() {}
@@ -84,15 +114,19 @@ export class Project extends EventEmitter<ProjectEvent> {
     private handleChange(data: WebSocketMessageData['change']) {
         // 全塔属性
         if (/project(\/|\\)+data.js/.test(data.file)) {
-            this.mainData = this.parseJSONEDMotaData(
-                data.content.data as string
-            );
-
             this.emit('mainDataChange', this.mainData);
         }
     }
 
-    private watchTableChange() {
+    private handleAdd(data: WebSocketMessageData['add']) {
+        emitFileChange(data.file, this);
+    }
+
+    private handleRemove(data: WebSocketMessageData['remove']) {
+        emitFileChange(data.file, this);
+    }
+
+    private onTableChange() {
         // 全塔属性
         this.on('mainDataChange', data => {
             projectInfo.name.value = this.mainData.firstData.name;
@@ -102,6 +136,38 @@ export class Project extends EventEmitter<ProjectEvent> {
             updateMainData(data);
         });
     }
+
+    private onFileChange() {
+        this.on('fileChange', (path, uri) => {
+            // 选项编辑器
+            selectionList.forEach(async v => {
+                const selection = v.list.find(v => v.uri.toString() === uri);
+                if (!selection || selection.info.target !== 'file') return;
+                if (!selection.canWatch) return;
+                const selected = getTableObject(Uri.parse(uri));
+
+                await selection.parseFile();
+                selection.updateSelected(selected.content);
+            });
+        });
+    }
+}
+
+// 500ms debounce
+const timeoutMap: Record<string, number> = {};
+function emitFileChange(path: string, project: Project) {
+    const folder = path
+        .replace(/(\/|\\)+/g, '/')
+        .split('/')
+        .slice(0, -1)
+        .join('/');
+
+    const uri = watchFolders[folder];
+    if (!uri) return;
+    if (timeoutMap[folder]) clearTimeout(timeoutMap[path]);
+    timeoutMap[folder] = window.setTimeout(() => {
+        project.emit('fileChange', path, uri);
+    }, 500);
 }
 
 function updateMainData(data: DataCore) {
@@ -123,6 +189,7 @@ function updateMainData(data: DataCore) {
             list.map(v => {
                 if (!v.canWatch) return;
                 if (v.uri.scheme !== 'data') return;
+
                 return (async () => {
                     const content = getTableObject<string[]>(v.uri, { data });
                     if (content.info.target === 'file') await v.parseFile();

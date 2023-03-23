@@ -1,14 +1,8 @@
 import { Button } from 'ant-design-vue';
 import { Uri } from 'monaco-editor';
-import { projectInfo } from '../../../../editor/project/project';
+import { projectInfo, tables } from '../../../../editor/project/project';
 import { view } from '../../../../editor/view/control';
-import {
-    addCode,
-    addSelection,
-    showCode,
-    showSelection,
-    tables
-} from '../../control';
+import { addCode, addSelection, showCode, showSelection } from '../../control';
 import {
     CodeController,
     CodeFile,
@@ -158,6 +152,7 @@ function onTableSave(file: MultiItem, type: TableElement['type'] = 'code') {
                 void 0,
                 4
             );
+
             await window.editor.file.write(
                 `${projectInfo.project!.data.path}/project/data.js`,
                 `var data_a1e2fb4a_e986_4524_b0da_9b7ba7c0874d = \r\n${content}`,

@@ -40,7 +40,7 @@
                         "jpeg.previewImage()",
                         "gif.previewImage()"
                     ],
-                    "path": "project/images/"
+                    "path": "project/images"
                 },
                 "tilesets": {
                     "type": "select",
@@ -55,7 +55,7 @@
                     "suffix": [
                         "png.uncancelable().previewImage()"
                     ],
-                    "path": "project/tilesets/"
+                    "path": "project/tilesets"
                 },
                 "animates": {
                     "type": "select",
@@ -69,7 +69,7 @@
                     "suffix": [
                         "animate.hide()"
                     ],
-                    "path": "project/animates/"
+                    "path": "project/animates"
                 },
                 "bgms": {
                     "type": "select",
@@ -85,7 +85,7 @@
                         "wav",
                         "flac"
                     ],
-                    "path": "project/bgms/"
+                    "path": "project/bgms"
                 },
                 "sounds": {
                     "type": "select",
@@ -101,7 +101,7 @@
                         "wav",
                         "flac"
                     ],
-                    "path": "project/sounds/"
+                    "path": "project/sounds"
                 },
                 "fonts": {
                     "type": "select",
@@ -115,7 +115,7 @@
                         "ttf",
                         "oft"
                     ],
-                    "path": "project/fonts/"
+                    "path": "project/fonts"
                 },
                 "nameMap": {
                     "type": "event",
