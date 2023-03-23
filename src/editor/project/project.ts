@@ -1,4 +1,4 @@
-import { ref, Ref } from 'vue';
+import { reactive, ref, Ref } from 'vue';
 import type {
     MotaProjectData,
     ProjectInfo as Info
@@ -8,14 +8,23 @@ import {
     codeList,
     getFormatedString
 } from '../../panel/view/components/code/code';
-import { getTableObject } from '../../panel/view/components/table/table';
+import { MultiItem } from '../../panel/view/components/multi/multi';
+import {
+    Selection,
+    selectionList
+} from '../../panel/view/components/select/select';
+import {
+    getTableObject,
+    TableObject
+} from '../../panel/view/components/table/table';
+import { EventEmitter } from '../utils/event';
 import { SocketHandler, WebSocketMessageData } from './socket';
 
 interface ProjectEvent {
     mainDataChange: (data: DataCore) => void;
 }
 
-export class Project {
+export class Project extends EventEmitter<ProjectEvent> {
     name: string;
     title: string;
     version: string;
@@ -32,6 +41,7 @@ export class Project {
     info: Info;
 
     constructor(data: MotaProjectData) {
+        super();
         this.data = data;
         this.info = data.info;
         const mainData = data.mainInfo[0];
@@ -56,15 +66,6 @@ export class Project {
 
     close() {}
 
-    on<K extends keyof ProjectEvent>(type: K, fn: ProjectEvent[K]) {
-        this.events[type] ??= [];
-        this.events[type]!.push(fn);
-    }
-
-    dispatch<K extends keyof ProjectEvent>(event: K, params: any) {
-        this.events[event]?.forEach(v => v(params));
-    }
-
     setupSocket() {
         this.socket.on('change', (data, e) => this.handleChange(data));
     }
@@ -83,7 +84,11 @@ export class Project {
     private handleChange(data: WebSocketMessageData['change']) {
         // 全塔属性
         if (/project(\/|\\)+data.js/.test(data.file)) {
-            this.dispatch('mainDataChange', this.mainData);
+            this.mainData = this.parseJSONEDMotaData(
+                data.content.data as string
+            );
+
+            this.emit('mainDataChange', this.mainData);
         }
     }
 
@@ -94,21 +99,41 @@ export class Project {
             projectInfo.title.value = this.mainData.firstData.title;
             projectInfo.version.value = this.mainData.firstData.version;
 
-            const checkCode = (list: CodeFile[]) => {
-                list.forEach(v => {
-                    if (!v.saved.value || !v.canWatch) return;
-                    if (v.uri.scheme !== 'data') return;
-                    const content = getTableObject(v.uri, { data });
-                    const text = getFormatedString(
-                        content.content,
-                        content.info.type as 'json' | 'code' | 'text'
-                    );
-                    v.update(text);
-                });
-            };
-            codeList.forEach(v => checkCode(v.list));
+            updateMainData(data);
         });
     }
+}
+
+function updateMainData(data: DataCore) {
+    const checkCode = (list: CodeFile[]) => {
+        list.forEach(v => {
+            if (!v.saved.value || !v.canWatch) return;
+            if (v.uri.scheme !== 'data') return;
+            const content = getTableObject(v.uri, { data });
+            const text = getFormatedString(
+                content.content,
+                content.info.type as 'json' | 'code' | 'text'
+            );
+            v.update(text);
+        });
+    };
+
+    const checkSelect = async (list: Selection[]) => {
+        await Promise.all(
+            list.map(v => {
+                if (!v.canWatch) return;
+                if (v.uri.scheme !== 'data') return;
+                return (async () => {
+                    const content = getTableObject<string[]>(v.uri, { data });
+                    if (content.info.target === 'file') await v.parseFile();
+                    v.updateSelected(content.content);
+                })();
+            })
+        );
+    };
+
+    codeList.forEach(v => checkCode(v.list));
+    selectionList.forEach(v => checkSelect(v.list));
 }
 
 interface ProjectInfo {

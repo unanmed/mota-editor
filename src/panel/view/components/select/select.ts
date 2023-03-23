@@ -1,3 +1,4 @@
+import { debounce } from 'lodash';
 import { Uri } from 'monaco-editor';
 import { reactive, ref, Ref, shallowReactive } from 'vue';
 import { projectInfo } from '../../../../editor/project/project';
@@ -79,8 +80,6 @@ export class Selection extends MultiItem<Select[]> {
     name: string;
     suffix: Record<string, FiledSelectSuffix[]> = {};
 
-    canWatch: boolean = true;
-
     constructor(info: SelectInfo, selected: string[], base: string, uri: Uri) {
         super(uri);
         this.type = info.multi ? 'multi' : 'single';
@@ -90,14 +89,7 @@ export class Selection extends MultiItem<Select[]> {
         this.defaultAll.value =
             !!projectInfo.project!.info.defaultAll?.includes(uri.toString());
         this.parseTarget(info.target).then(() => {
-            selected.forEach(v => {
-                const index = this.choice.findIndex(vv => {
-                    return vv.text === v;
-                });
-                if (index !== -1) {
-                    this.choice[index].selected = true;
-                }
-            });
+            this.updateSelected(selected);
         });
     }
 
@@ -107,9 +99,7 @@ export class Selection extends MultiItem<Select[]> {
         for await (const fn of this.event.save!) {
             if (!(await fn(this.choice))) success = false;
         }
-        setTimeout(() => {
-            this.canWatch = true;
-        }, 100);
+        this.enableWatch();
     }
 
     async parseTarget(target: string) {
@@ -150,6 +140,17 @@ export class Selection extends MultiItem<Select[]> {
     }
 
     update(content: Select[]): void {}
+
+    updateSelected(selected: string[]) {
+        selected.forEach(v => {
+            const index = this.choice.findIndex(vv => {
+                return vv.text === v;
+            });
+            if (index !== -1) {
+                this.choice[index].selected = true;
+            }
+        });
+    }
 
     private parseSuffix() {
         if (!this.info.suffix) return;

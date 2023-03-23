@@ -1,3 +1,4 @@
+import { debounce } from 'lodash';
 import { Uri } from 'monaco-editor';
 import { ref, Ref, shallowReactive } from 'vue';
 import { EventEmitter } from '../../../../editor/utils/event';
@@ -41,6 +42,12 @@ export abstract class MultiItem<Content = any, Event = {}> extends EventEmitter<
     MultiItemEvent<Content> & Event
 > {
     uri: Uri;
+
+    canWatch: boolean = true;
+
+    enableWatch = debounce(() => {
+        this.canWatch = true;
+    }, 100);
 
     constructor(uri: Uri) {
         super();

@@ -108,7 +108,7 @@ export function TableRenderer(props: TableProps) {
     }
 }
 
-interface TableObject<T = any> {
+export interface TableObject<T = any> {
     root: any;
     content: T;
     info: TableElement;

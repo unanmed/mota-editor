@@ -110,9 +110,7 @@ export class CodeFile extends MultiItem<string> {
             if (!(await fn(this.model.getValue()))) success = false;
         }
         if (success) this.saved.value = true;
-        setTimeout(() => {
-            this.canWatch = true;
-        }, 100);
+        this.enableWatch();
     }
 
     update(content: string): void {
