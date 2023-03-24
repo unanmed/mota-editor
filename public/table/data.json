@@ -168,6 +168,228 @@
                     "doc": [
                         "游戏名，将显示在标题页面以及切换楼层的界面中"
                     ]
+                },
+                "name": {
+                    "type": "text",
+                    "text": "唯一英文标识符",
+                    "regexp": "^[a-zA-Z0-9]{1,30}$",
+                    "doc": [
+                        "游戏的唯一英文标识符。由英文、数字、下划线组成，不能超过30个字符。",
+                        "此项必须修改，其将直接影响到存档的定位！"
+                    ]
+                },
+                "version": {
+                    "type": "text",
+                    "text": "游戏版本",
+                    "doc": [
+                        "当前游戏版本；版本不一致的存档不能通用。"
+                    ]
+                },
+                "floorId": {
+                    "type": "select",
+                    "text": "初始楼层",
+                    "doc": [
+                        "初始楼层的ID"
+                    ],
+                    "target": "this.main.floorIds"
+                },
+                "hero": {
+                    "type": "object",
+                    "text": "勇士初始属性",
+                    "data": {
+                        "image": {
+                            "type": "select",
+                            "text": "行走图",
+                            "doc": [
+                                "勇士的行走图"
+                            ],
+                            "target": "this.main.images",
+                            "suffix": [
+                                "png"
+                            ]
+                        },
+                        "animate": {
+                            "type": "checkbox",
+                            "text": "帧动画",
+                            "doc": [
+                                "是否开启停止状态和对话框的帧动画"
+                            ]
+                        },
+                        "name": {
+                            "type": "text",
+                            "text": "勇士名",
+                            "doc": [
+                                "勇士的名称"
+                            ]
+                        },
+                        "lv": {
+                            "type": "number",
+                            "text": "勇士等级",
+                            "doc": [
+                                "勇士的初始等级"
+                            ]
+                        },
+                        "hpmax": {
+                            "type": "number",
+                            "text": "生命上限",
+                            "doc": [
+                                "勇士的初始生命上限"
+                            ]
+                        },
+                        "hp": {
+                            "type": "number",
+                            "text": "生命",
+                            "doc": [
+                                "勇士的初始生命"
+                            ]
+                        },
+                        "manamax": {
+                            "type": "number",
+                            "text": "魔力上限",
+                            "doc": [
+                                "勇士的初始魔力上限，此项非负才会生效（小于0不会生效）"
+                            ]
+                        },
+                        "mana": {
+                            "type": "number",
+                            "text": "初始魔力",
+                            "doc": [
+                                "勇士的初始魔力"
+                            ]
+                        },
+                        "atk": {
+                            "type": "number",
+                            "text": "初始攻击",
+                            "doc": [
+                                "勇士的初始攻击"
+                            ]
+                        },
+                        "def": {
+                            "type": "number",
+                            "text": "初始防御",
+                            "doc": [
+                                "勇士的初始防御"
+                            ]
+                        },
+                        "mdef": {
+                            "type": "number",
+                            "text": "初始护盾",
+                            "doc": [
+                                "勇士的初始护盾"
+                            ]
+                        },
+                        "money": {
+                            "type": "number",
+                            "text": "初始金币",
+                            "doc": [
+                                "勇士的初始金币"
+                            ]
+                        },
+                        "exp": {
+                            "type": "number",
+                            "text": "初始经验",
+                            "doc": [
+                                "勇士的初始经验"
+                            ]
+                        },
+                        "equipment": {
+                            "type": "event",
+                            "event": "init_equipment",
+                            "text": "初始装备",
+                            "doc": [
+                                "勇士初始装备上的装备，装备孔需对应"
+                            ]
+                        },
+                        "items": {
+                            "type": "object",
+                            "text": "初始道具",
+                            "hide": true,
+                            "data": {
+                                "constants": {
+                                    "type": "event",
+                                    "event": "init_item_constants",
+                                    "text": "永久道具",
+                                    "doc": [
+                                        "初始永久道具个数，例如初始送手册等"
+                                    ]
+                                },
+                                "tools": {
+                                    "type": "event",
+                                    "event": "init_item_tools",
+                                    "text": "消耗道具",
+                                    "doc": [
+                                        "初始消耗道具（非永久道具）个数，例如初始赠送两破等"
+                                    ]
+                                },
+                                "equips": {
+                                    "type": "event",
+                                    "event": "init_item_equips",
+                                    "text": "装备",
+                                    "doc": [
+                                        "初始装备个数（在背包栏，没有装备上），例如初始送铁剑等"
+                                    ]
+                                }
+                            }
+                        },
+                        "loc": {
+                            "type": "object",
+                            "text": "初始位置",
+                            "data": {
+                                "direction": {
+                                    "type": "select",
+                                    "text": "初始朝向",
+                                    "doc": [
+                                        "勇士的初始朝向"
+                                    ],
+                                    "target": "value",
+                                    "value": [
+                                        "up",
+                                        "left",
+                                        "right",
+                                        "down"
+                                    ]
+                                },
+                                "x": {
+                                    "type": "number",
+                                    "text": "初始横坐标",
+                                    "doc": [
+                                        "勇士的初始横坐标"
+                                    ]
+                                },
+                                "y": {
+                                    "type": "number",
+                                    "text": "初始纵坐标",
+                                    "doc": [
+                                        "勇士的初始纵坐标"
+                                    ]
+                                }
+                            }
+                        },
+                        "flags": {
+                            "type": "json",
+                            "text": "初始变量",
+                            "doc": [
+                                "游戏初始时设置的变量值"
+                            ]
+                        },
+                        "followers": {
+                            "type": "disabled",
+                            "hide": true
+                        },
+                        "steps": {
+                            "type": "disabled",
+                            "hide": true
+                        }
+                    }
+                },
+                "startCanvas": {
+                    "type": "event",
+                    "event": "common",
+                    "text": "标题事件",
+                    "doc": [
+                        "标题界面事件化，可以使用事件流的形式来绘制开始界面等。",
+                        "需要开启startUsingCanvas这个开关。详见文档-个性化-标题界面事件化。"
+                    ]
                 }
             }
         }

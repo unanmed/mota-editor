@@ -41,6 +41,8 @@ export interface TableProps {
 export function TableRenderer(props: TableProps) {
     const data = props.data;
 
+    if (data.hide) return <div></div>;
+
     if (data.type === 'object') {
         return (
             <Table
@@ -139,10 +141,15 @@ function getTableValue(uri: Uri, type: TableElement['type'] = 'code') {
 }
 
 function onTableSave(file: MultiItem, type: TableElement['type'] = 'code') {
-    const { root, lastKey: key } = getTableObject(file.uri);
+    const { root, lastKey: key, info } = getTableObject(file.uri);
     file.on('save', async (content: any) => {
+        const regexp = info.regexp;
+        const data = getParsedData(content, type);
+        if (regexp) {
+            if (!new RegExp(regexp).test(data)) return false;
+        }
         // 对表格数据赋值
-        root[key] = getParsedData(content, type);
+        root[key] = data;
 
         const scheme = file.uri.scheme;
         // 保存至本地文件
