@@ -89,7 +89,7 @@ export class Selection extends MultiItem<Select[]> {
         this.defaultAll.value =
             !!projectInfo.project!.info.defaultAll?.includes(uri.toString());
         this.parseTarget(info.target).then(() => {
-            this.updateSelected(selected);
+            this.updateSelected(selected, false);
         });
     }
 
@@ -141,7 +141,7 @@ export class Selection extends MultiItem<Select[]> {
 
     update(content: Select[]): void {}
 
-    updateSelected(selected: string[]) {
+    updateSelected(selected: string[], save: boolean = true) {
         if (this.defaultAll.value) {
             this.choice.forEach(v => (v.selected = true));
         } else {
@@ -154,7 +154,7 @@ export class Selection extends MultiItem<Select[]> {
                 }
             });
         }
-        this.save();
+        if (save) this.save();
     }
 
     private parseSuffix() {
