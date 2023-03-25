@@ -4,7 +4,7 @@ import Table from './table.vue';
 import { Edit } from './tableEdit';
 import { Divider } from 'ant-design-vue';
 
-type TableType =
+export type TableType =
     | 'object'
     | 'code'
     | 'text'

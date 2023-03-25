@@ -13,7 +13,7 @@ import {
     Select,
     Selection
 } from '../select/select';
-import { getTableObject, TableElement, TableProps } from './table';
+import { getTableObject, TableElement, TableProps, TableType } from './table';
 import { checkboxList, TableElement as Element, textList } from './element';
 import Checkbox from './components/checkbox.vue';
 import Text from './components/text.vue';
@@ -74,6 +74,7 @@ export function buttonEdit(props: TableProps, uri: Uri, content: any) {
             projectInfo.project!.data.path,
             uri
         );
+
         select.add(selection);
         onTableSave(selection, 'select');
 
@@ -92,7 +93,7 @@ function onTableSave(file: MultiItem, type: TableElement['type'] = 'code') {
     const { root, lastKey: key, info } = getTableObject(file.uri);
     file.on('save', async (content: any) => {
         const regexp = info.regexp;
-        const data = getParsedData(content, type);
+        const data = getParsedData(content, type, file);
         if (regexp) {
             if (!new RegExp(regexp).test(data)) return false;
         }
@@ -106,11 +107,15 @@ function onTableSave(file: MultiItem, type: TableElement['type'] = 'code') {
     });
 }
 
-function getParsedData(data: any, type: TableElement['type']) {
+function getParsedData(data: any, type: TableType, item: MultiItem) {
     if (type === 'json' || type === 'number') {
         return JSON.parse(data);
     } else if (type === 'select') {
-        return (data as Select[]).filter(v => v.selected).map(v => v.text);
+        if ((item as Selection).type === 'multi') {
+            return (data as Select[]).filter(v => v.selected).map(v => v.text);
+        } else {
+            return (data as Select[]).find(v => v.selected)?.text;
+        }
     } else {
         return data;
     }

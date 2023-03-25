@@ -1,4 +1,3 @@
-import { debounce } from 'lodash';
 import { Uri } from 'monaco-editor';
 import { reactive, ref, Ref, shallowReactive } from 'vue';
 import { projectInfo } from '../../../../editor/project/project';
@@ -12,6 +11,7 @@ export interface SelectInfo {
     multi?: boolean;
     suffix?: string[];
     path?: string;
+    value?: string[];
 }
 
 export class SelectionController extends MultiController<Selection> {
@@ -80,7 +80,12 @@ export class Selection extends MultiItem<Select[]> {
     name: string;
     suffix: Record<string, FiledSelectSuffix[]> = {};
 
-    constructor(info: SelectInfo, selected: string[], base: string, uri: Uri) {
+    constructor(
+        info: SelectInfo,
+        selected: string[] | string,
+        base: string,
+        uri: Uri
+    ) {
         super(uri);
         this.type = info.multi ? 'multi' : 'single';
         this.info = info;
@@ -99,6 +104,15 @@ export class Selection extends MultiItem<Select[]> {
 
     async parseTarget(target: string) {
         if (target === 'file') return this.parseFile();
+        if (target === 'value') {
+            this.choice = this.info.value!.map(v =>
+                reactive({
+                    text: v,
+                    selected: false
+                })
+            );
+            return;
+        }
     }
 
     async parseFile() {
@@ -137,12 +151,17 @@ export class Selection extends MultiItem<Select[]> {
     update(content: Select[]): void {}
 
     updateSelected(selected: string[] | string, save: boolean = true) {
-        if (typeof selected === 'string') {
-            if (!this.info.multi) {
+        if (typeof selected === 'string' || !selected) {
+            if (this.info.multi) {
                 throw new TypeError(
                     `Expected for a string, but an array delivered in single selection.`
                 );
             }
+
+            this.choice.forEach(v => {
+                v.selected = v.text === selected;
+            });
+            return;
         } else {
             if (this.defaultAll.value) {
                 this.choice.forEach(v => (v.selected = true));

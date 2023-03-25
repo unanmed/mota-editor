@@ -40,7 +40,7 @@ export function updateMainData(data: DataCore) {
             const content = getTableObject(v.uri, { data });
             const text = getFormatedString(
                 content.content,
-                content.info.type as 'json' | 'code' | 'text'
+                content.info.type as 'json' | 'code' | 'text' | 'number'
             );
             v.update(text);
         });

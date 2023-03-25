@@ -21,7 +21,7 @@
         <template #right>
             <span v-if="!show" class="select-empty">Selection Editor</span>
             <div
-                v-else-if="select.info.multi"
+                v-else-if="select.type === 'multi'"
                 class="select-main unique-scroll"
             >
                 <span
@@ -71,6 +71,24 @@
                     </div>
                 </div>
             </div>
+            <div v-else class="select-main unique-scroll">
+                <span
+                    class="select-doc"
+                    v-html="parseDoc(select.info.doc)"
+                ></span>
+                <a-divider class="divider"></a-divider>
+                <div class="select-data">
+                    <div class="select-selection">
+                        <a-radio
+                            class="radio"
+                            v-for="selection of selectList"
+                            :checked="selection.root.selected"
+                            @click="onSingleChange(selection)"
+                            >{{ selection.text }}
+                        </a-radio>
+                    </div>
+                </div>
+            </div>
         </template>
     </Multi>
 </template>
@@ -86,6 +104,7 @@ import {
 } from './select';
 import { CloseOutlined } from '@ant-design/icons-vue';
 import { parseDoc } from '../../../../editor/utils/utils';
+import { debounce } from 'lodash';
 
 interface DecoratedString {
     root: Select;
@@ -179,6 +198,12 @@ function save(check?: boolean) {
     select.value.save();
 }
 
+const singleSave = debounce(save, 100);
+function onSingleChange(str: DecoratedString) {
+    select.value.updateSelected(str.text);
+    singleSave();
+}
+
 onUnmounted(() => {
     props.selection.added = false;
     props.selection.list.splice(0);
@@ -269,5 +294,15 @@ onUnmounted(() => {
     margin-left: 10px;
     color: yellow;
     font-weight: bold;
+}
+
+.select-selection {
+    display: flex;
+    flex-direction: column;
+
+    .radio {
+        margin: 4px 12px;
+        font-size: 16px;
+    }
 }
 </style>
