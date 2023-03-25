@@ -1,18 +1,18 @@
 <template>
-    <a-checkbox :checked="checkbox.checked.value" @change="change"></a-checkbox>
+    <a-checkbox :checked="checkbox.value.value" @change="change"></a-checkbox>
 </template>
 
 <script lang="ts" setup>
 import { onUnmounted } from 'vue';
-import { checkboxList, TableCheckbox } from './checkbox';
 import { spliceElement } from '../../../../../editor/utils/utils';
+import { TableElement, checkboxList } from '../element';
 
 const props = defineProps<{
-    checkbox: TableCheckbox;
+    checkbox: TableElement<boolean>;
 }>();
 
 function change() {
-    props.checkbox.checked.value = !props.checkbox.checked.value;
+    props.checkbox.value.value = !props.checkbox.value.value;
     props.checkbox.save();
 }
 

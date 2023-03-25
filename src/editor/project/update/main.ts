@@ -9,8 +9,9 @@ import {
 } from '../../../panel/view/components/select/select';
 import {
     checkboxList,
-    TableCheckbox
-} from '../../../panel/view/components/table/checkbox/checkbox';
+    TableElement,
+    textList
+} from '../../../panel/view/components/table/element';
 import { getTableObject } from '../../../panel/view/components/table/table';
 import { Project, watchFolders } from '../project';
 
@@ -60,17 +61,19 @@ export function updateMainData(data: DataCore) {
         );
     };
 
-    const checkCheckbox = (list: TableCheckbox[]) => {
-        list.map(v => {
-            if (!v.canWatch) return;
-            if (v.uri.scheme !== 'data') return;
+    const checkTableElement = (...list: TableElement[][]) => {
+        list.forEach(v => {
+            v.map(v => {
+                if (!v.canWatch) return;
+                if (v.uri.scheme !== 'data') return;
 
-            const content = getTableObject<boolean>(v.uri, { data });
-            v.update(content.content);
+                const content = getTableObject<boolean>(v.uri, { data });
+                v.update(content.content);
+            });
         });
     };
 
     codeList.forEach(v => checkCode(v.list));
     selectionList.forEach(v => checkSelect(v.list));
-    checkCheckbox(checkboxList);
+    checkTableElement(checkboxList, textList);
 }

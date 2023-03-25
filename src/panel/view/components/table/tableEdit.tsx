@@ -14,8 +14,9 @@ import {
     Selection
 } from '../select/select';
 import { getTableObject, TableElement, TableProps } from './table';
+import { checkboxList, TableElement as Element, textList } from './element';
 import Checkbox from './checkbox/checkbox.vue';
-import { TableCheckbox } from './checkbox/checkbox';
+import Text from './text/text.vue';
 
 export function Edit(props: TableProps) {
     const uri = new Uri().with({
@@ -24,9 +25,13 @@ export function Edit(props: TableProps) {
     });
     const content = getTableObject(uri);
     if (props.data.type === 'checkbox') {
-        const checkbox = new TableCheckbox(uri);
+        const checkbox = new Element(uri, checkboxList);
         onTableSave(checkbox, 'checkbox');
         return <Checkbox checkbox={checkbox}></Checkbox>;
+    } else if (props.data.type === 'text') {
+        const text = new Element(uri, textList);
+        onTableSave(text, 'text');
+        return <Text props={props} text={text}></Text>;
     } else {
         return (
             <Button
@@ -39,7 +44,7 @@ export function Edit(props: TableProps) {
     }
 }
 
-function buttonEdit(props: TableProps, uri: Uri, content: any) {
+export function buttonEdit(props: TableProps, uri: Uri, content: any) {
     const data = props.data;
 
     if (data.type === 'code' || data.type === 'text' || data.type === 'json') {
