@@ -103,14 +103,8 @@ export class CodeFile extends MultiItem<string> {
     }
 
     async save() {
-        this.canWatch = false;
-        let success = true;
-        if (!this.event.save) return;
-        for await (const fn of this.event.save!) {
-            if (!(await fn(this.model.getValue()))) success = false;
-        }
+        const success = await this.doSave(this.model.getValue());
         if (success) this.saved.value = true;
-        this.enableWatch();
     }
 
     update(content: string): void {

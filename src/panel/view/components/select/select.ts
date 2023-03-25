@@ -94,12 +94,7 @@ export class Selection extends MultiItem<Select[]> {
     }
 
     async save() {
-        this.canWatch = false;
-        let success = false;
-        for await (const fn of this.event.save!) {
-            if (!(await fn(this.choice))) success = false;
-        }
-        this.enableWatch();
+        this.doSave(this.choice);
     }
 
     async parseTarget(target: string) {
@@ -141,18 +136,26 @@ export class Selection extends MultiItem<Select[]> {
 
     update(content: Select[]): void {}
 
-    updateSelected(selected: string[], save: boolean = true) {
-        if (this.defaultAll.value) {
-            this.choice.forEach(v => (v.selected = true));
+    updateSelected(selected: string[] | string, save: boolean = true) {
+        if (typeof selected === 'string') {
+            if (!this.info.multi) {
+                throw new TypeError(
+                    `Expected for a string, but an array delivered in single selection.`
+                );
+            }
         } else {
-            selected.forEach(v => {
-                const index = this.choice.findIndex(vv => {
-                    return vv.text === v;
+            if (this.defaultAll.value) {
+                this.choice.forEach(v => (v.selected = true));
+            } else {
+                selected.forEach(v => {
+                    const index = this.choice.findIndex(vv => {
+                        return vv.text === v;
+                    });
+                    if (index !== -1) {
+                        this.choice[index].selected = true;
+                    }
                 });
-                if (index !== -1) {
-                    this.choice[index].selected = true;
-                }
-            });
+            }
         }
         if (save) this.save();
     }

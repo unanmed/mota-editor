@@ -57,4 +57,15 @@ export abstract class MultiItem<Content = any, Event = {}> extends EventEmitter<
     abstract save(content?: Content): void;
 
     abstract update(content: Content): void;
+
+    protected async doSave(content: Content) {
+        this.canWatch = false;
+        let success = true;
+        if (!this.event.save) return true;
+        for await (const fn of this.event.save!) {
+            if (!(await fn(content))) success = false;
+        }
+        this.enableWatch();
+        return success;
+    }
 }
