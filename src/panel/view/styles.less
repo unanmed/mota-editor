@@ -57,29 +57,34 @@
     border-bottom: 1px solid #666;
     white-space: pre-wrap;
     word-break: break-all;
+    min-height: 48px;
+
+    .table-divider {
+        background-color: #666;
+        margin: 0;
+    }
 
     .table-key {
         display: flex;
         justify-content: center;
-        border-right: 1px solid #666;
-        flex-basis: 40%;
+        width: 400%;
+        max-width: 200px;
         font-family: code;
-        max-width: 40%;
     }
 
     .table-text {
         display: flex;
         justify-content: center;
-        border-right: 1px solid #666;
-        flex-basis: 30%;
-        max-width: 30%;
+        align-items: center;
+        width: 300%;
+        max-width: 150px;
     }
 
     .table-edit {
         display: flex;
+        align-items: center;
         justify-content: center;
-        flex-basis: 30%;
-        max-width: 30%;
+        width: 300%;
     }
 }
 

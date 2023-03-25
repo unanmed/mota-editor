@@ -16,7 +16,7 @@ export function addData() {
             path: ''
         })
             .setDefaultSize(500, 500)
-            .setMaxSize(750)
+            .setMaxSize(1000)
             .focus()
     );
 }

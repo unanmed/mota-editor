@@ -126,7 +126,11 @@ export function createCodeFile(
 
 export const codeList: CodeController[] = [];
 
-export function getFormatedString(data: any, type: 'code' | 'json' | 'text') {
-    if (type === 'json') return JSON.stringify(data, void 0, 4);
+export function getFormatedString(
+    data: any,
+    type: 'code' | 'json' | 'text' | 'number'
+) {
+    if (type === 'json' || type === 'number')
+        return JSON.stringify(data, void 0, 4);
     else return data as string;
 }

@@ -2,6 +2,7 @@ import { Uri } from 'monaco-editor';
 import { projectInfo, tables } from '../../../../editor/project/project';
 import Table from './table.vue';
 import { Edit } from './tableEdit';
+import { Divider } from 'ant-design-vue';
 
 type TableType =
     | 'object'
@@ -11,7 +12,8 @@ type TableType =
     | 'select'
     | 'checkbox'
     | 'event'
-    | 'disabled';
+    | 'disabled'
+    | 'number';
 
 export interface TableElement {
     type: TableType;
@@ -51,7 +53,9 @@ export function TableRenderer(props: TableProps) {
         return (
             <div class={'table-one'}>
                 <span class={'table-key'}>{props.keys}</span>
+                <Divider class="table-divider" type="vertical"></Divider>
                 <span class={'table-text'}>{data.text ?? ''}</span>
+                <Divider class="table-divider" type="vertical"></Divider>
                 <span class={'table-edit'}>
                     <Edit
                         root={props.root}
