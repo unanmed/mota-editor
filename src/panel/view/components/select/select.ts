@@ -2,6 +2,7 @@ import { Uri } from 'monaco-editor';
 import { reactive, ref, Ref, shallowReactive } from 'vue';
 import { projectInfo } from '../../../../editor/project/project';
 import { MultiController, MultiItem } from '../multi/multi';
+import { getTableObject } from '../table/table';
 
 export interface SelectInfo {
     type: 'select';
@@ -99,12 +100,25 @@ export class Selection extends MultiItem<Select[]> {
     }
 
     async save() {
-        this.doSave(this.choice);
+        await this.doSave(this.choice);
+        if (this.type === 'multi') {
+            selectionList.forEach(v => {
+                v.list.forEach(v => {
+                    if (
+                        v.info.target !== 'file' &&
+                        v.info.target !== 'value' &&
+                        v.type === 'single'
+                    ) {
+                        v.parseTarget(v.info.target);
+                    }
+                });
+            });
+        }
     }
 
-    async parseTarget(target: string) {
+    async parseTarget(target: string, data?: DataCore) {
         if (target === 'file') return this.parseFile();
-        if (target === 'value') {
+        else if (target === 'value') {
             this.choice = this.info.value!.map(v =>
                 reactive({
                     text: v,
@@ -112,6 +126,25 @@ export class Selection extends MultiItem<Select[]> {
                 })
             );
             return;
+        } else {
+            // 一般值
+            const scheme = this.uri.scheme;
+            const t = target.replace(/^this/, scheme);
+            const content = getTableObject<string[]>(
+                new Uri().with({ scheme: this.uri.scheme, path: t }),
+                data ? { data } : void 0
+            );
+
+            if (!(content.content instanceof Array)) return;
+            this.choice.splice(0);
+            this.choice.push(
+                ...content.content.map(v =>
+                    reactive({
+                        text: v,
+                        selected: false
+                    })
+                )
+            );
         }
     }
 

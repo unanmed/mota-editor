@@ -55,6 +55,9 @@ export function updateMainData(data: DataCore) {
                 return (async () => {
                     const content = getTableObject<string[]>(v.uri, { data });
                     if (content.info.target === 'file') await v.parseFile();
+                    else if (content.info.target !== 'value') {
+                        await v.parseTarget(content.info.target, data);
+                    }
                     v.updateSelected(content.content);
                 })();
             })
