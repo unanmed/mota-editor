@@ -32,7 +32,7 @@
                     <a-divider class="divider"></a-divider>
                     注：默认全选是指当对应文件夹的内容改变时，是否将增加的内容直接选中。
                     例如当图片文件夹中新增了一个123.png时，如果勾上了默认全选，那么编辑器将会自动选中该文件。
-                    此选项仅在编辑器开启的情况下有效。
+                    此选项仅在选项编辑器中存在对应的编辑项的情况下有效。
                 </span>
                 <a-divider class="divider"></a-divider>
                 <div class="select-data">
@@ -76,13 +76,50 @@
                                 >预览</a-button
                             >
                             <div
-                                v-if="!!selection.previewing!.value"
+                                v-if="!!selection.previewing?.value"
                                 class="select-preview"
                             >
                                 <img
                                     v-if="selection.preview === 'image'"
-                                    :src="selection.previewData!.value"
+                                    :src="selection.previewImage!.value"
                                 />
+                                <div v-if="selection.preview === 'audio'">
+                                    <div class="preview-audio-buttons">
+                                        <span>
+                                            <a-button
+                                                @click="
+                                                    selection.previewAudio?.trigger()
+                                                "
+                                                >{{
+                                                    selection.previewAudio
+                                                        ?.playing.value
+                                                        ? '暂停'
+                                                        : '播放'
+                                                }}</a-button
+                                            >
+                                            <a-button
+                                                @click="
+                                                    selection.previewAudio?.ready()
+                                                "
+                                                >停止</a-button
+                                            >
+                                        </span>
+                                        <a-button
+                                            @click="
+                                                selection.previewAudio?.getData()
+                                            "
+                                            >刷新</a-button
+                                        >
+                                    </div>
+                                    <a-progress
+                                        :percent="
+                                            selection.previewAudio?.progress
+                                                ?.value ?? 0
+                                        "
+                                        :showInfo="false"
+                                    ></a-progress>
+                                </div>
+                                <a-divider class="divider"></a-divider>
                             </div>
                         </div>
                     </div>
@@ -121,7 +158,8 @@ import {
 } from './select';
 import { CloseOutlined } from '@ant-design/icons-vue';
 import { parseDoc } from '../../../../editor/utils/utils';
-import { debounce } from 'lodash';
+import { debounce, sortBy } from 'lodash';
+import { AudioPreviewer } from './preview';
 
 interface DecoratedString {
     root: Select;
@@ -130,8 +168,11 @@ interface DecoratedString {
     warn?: string;
     preview?: 'image' | 'audio';
     previewing?: Ref<boolean>;
-    previewData?: Ref<string>;
+    previewImage?: Ref<string>;
+    previewAudio?: AudioPreviewer;
 }
+
+const audios: AudioPreviewer[] = [];
 
 const props = defineProps<{
     selection: SelectionController;
@@ -163,6 +204,9 @@ const selectList = computed<DecoratedString[]>(() => {
     });
 });
 
+/**
+ * 后缀修饰符
+ */
 function applyDecorator(
     str: Select,
     fn: Record<string, FiledSelectSuffix[]>
@@ -179,13 +223,14 @@ function applyDecorator(
         root: str,
         text: str.text,
         previewing: ref(false),
-        previewData: ref('')
+        previewImage: ref('')
     };
     decorator.forEach(v => {
         if (v.fn === 'uncancelable' && str.selected) data.disabled = true;
         if (v.fn === 'hide') data.text = data.text.replace(`.${suffix}`, '');
         if (v.fn === 'warn') data.warn = v.params[0];
         if (v.fn === 'previewImage') data.preview = 'image';
+        if (v.fn === 'previewAudio') data.preview = 'audio';
     });
 
     return data;
@@ -221,6 +266,7 @@ function save(check?: boolean) {
     select.value.save();
 }
 
+// need debounce
 const singleSave = debounce(save, 100);
 function onSingleChange(str: DecoratedString) {
     select.value.updateSelected(str.text);
@@ -231,24 +277,42 @@ function getAbsolutePath(file: string) {
     return select.value.base + '/' + select.value.info.path + '/' + file;
 }
 
+/**
+ * 图片预览
+ */
 async function getImageBase64Data(file: string, str: DecoratedString) {
     const path = getAbsolutePath(file);
     const suffix = file.split('.').at(-1)!;
     const base64 = await window.editor.file.read(path, 'base64');
     const res = `data:image/${suffix};base64,${base64}`;
-    str.previewData!.value = res;
+    str.previewImage!.value = res;
+}
+
+function getAudioPreviewData(str: DecoratedString) {
+    const path = getAbsolutePath(str.text);
+    const previewer = new AudioPreviewer(path);
+    str.previewAudio = previewer;
+    audios.push(previewer);
 }
 
 function changePreview(selection: DecoratedString) {
     selection.previewing!.value = !selection.previewing!.value;
+    if (selection.preview === 'audio') {
+        selection.previewAudio?.ticker.clear();
+    }
+    if (!selection.previewing!.value) return;
     if (selection.preview === 'image') {
         getImageBase64Data(selection.text, selection);
+    } else if (selection.preview === 'audio') {
+        selection.previewAudio?.ready();
+        if (!selection.previewAudio) getAudioPreviewData(selection);
     }
 }
 
 onUnmounted(() => {
     props.selection.added = false;
     props.selection.list.splice(0);
+    audios.forEach(v => v.destroy());
 });
 </script>
 
@@ -365,6 +429,11 @@ onUnmounted(() => {
 
     img {
         max-width: 100%;
+    }
+
+    .preview-audio-buttons {
+        display: flex;
+        justify-content: space-between;
     }
 }
 </style>

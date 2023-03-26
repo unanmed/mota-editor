@@ -25,7 +25,9 @@ specifiers:
   monaco-editor: ^0.36.1
   monaco-editor-textmate: ^4.0.0
   monaco-textmate: ^3.0.1
+  mutate-animate: ^1.0.2
   onigasm: ^2.2.5
+  prism-media: ^1.3.5
   rimraf: ^4.4.0
   rollup: ^3.19.1
   splitpanes: ^3.1.5
@@ -51,7 +53,9 @@ dependencies:
   monaco-editor: 0.36.1
   monaco-editor-textmate: 4.0.0_n7746n4du5g5boijpd7xdle434
   monaco-textmate: 3.0.1_onigasm@2.2.5
+  mutate-animate: 1.0.2
   onigasm: 2.2.5
+  prism-media: 1.3.5
   rollup: 3.19.1
   splitpanes: 3.1.5
   vue: 3.2.47
@@ -3337,6 +3341,10 @@ packages:
     resolution: {integrity: sha512-YVE1mIJ4VpUMqZObFndk9CJu6DBJR/GB13p3tXuNbwD4XExaI5EOuRl6BHeIDxIqXZVxSfAC+y6U1Z/IxCfKUg==}
     dev: true
 
+  /mutate-animate/1.0.2:
+    resolution: {integrity: sha512-uWcaOOVORL1x4dQil3Bhm53XqfbHj0rbso1OCxp1VluUcUFbKZbEVsEOj++PIMHorXfGu9DMK5G9DZCQy5RMMw==}
+    dev: false
+
   /nan/2.17.0:
     resolution: {integrity: sha512-2ZTgtl0nJsO0KQCjEpxcIr5D+Yv90plTitZt9JBfQvVJDS5seMl3FOvsh3+9CoYWXf/1l5OaZzzF6nDm4cagaQ==}
     dev: false
@@ -3587,6 +3595,24 @@ packages:
       nanoid: 3.3.4
       picocolors: 1.0.0
       source-map-js: 1.0.2
+
+  /prism-media/1.3.5:
+    resolution: {integrity: sha512-IQdl0Q01m4LrkN1EGIE9lphov5Hy7WWlH6ulf5QdGePLlPas9p2mhgddTEHrlaXYjjFToM1/rWuwF37VF4taaA==}
+    peerDependencies:
+      '@discordjs/opus': '>=0.8.0 <1.0.0'
+      ffmpeg-static: ^5.0.2 || ^4.2.7 || ^3.0.0 || ^2.4.0
+      node-opus: ^0.3.3
+      opusscript: ^0.0.8
+    peerDependenciesMeta:
+      '@discordjs/opus':
+        optional: true
+      ffmpeg-static:
+        optional: true
+      node-opus:
+        optional: true
+      opusscript:
+        optional: true
+    dev: false
 
   /process-nextick-args/2.0.1:
     resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}
