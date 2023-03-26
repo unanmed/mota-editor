@@ -13,6 +13,7 @@ export interface SelectInfo {
     suffix?: string[];
     path?: string;
     value?: string[];
+    show?: string[];
 }
 
 export class SelectionController extends MultiController<Selection> {
@@ -62,6 +63,7 @@ export class SelectionController extends MultiController<Selection> {
 export interface Select {
     text: string;
     selected: boolean;
+    show?: string;
 }
 
 export interface FiledSelectSuffix {
@@ -119,10 +121,11 @@ export class Selection extends MultiItem<Select[]> {
     async parseTarget(target: string, data?: DataCore) {
         if (target === 'file') return this.parseFile();
         else if (target === 'value') {
-            this.choice = this.info.value!.map(v =>
+            this.choice = this.info.value!.map((v, i) =>
                 reactive({
                     text: v,
-                    selected: false
+                    selected: false,
+                    show: this.info.show?.[i]
                 })
             );
             return;
@@ -183,8 +186,12 @@ export class Selection extends MultiItem<Select[]> {
 
     update(content: Select[]): void {}
 
-    updateSelected(selected: string[] | string, save: boolean = true) {
-        if (typeof selected === 'string' || !selected) {
+    updateSelected(selected: string[] | string | number, save: boolean = true) {
+        if (
+            typeof selected === 'string' ||
+            typeof selected === 'number' ||
+            !selected
+        ) {
             if (this.info.multi) {
                 throw new TypeError(
                     `Expected for a string, but an array delivered in single selection.`
@@ -192,7 +199,7 @@ export class Selection extends MultiItem<Select[]> {
             }
 
             this.choice.forEach(v => {
-                v.selected = v.text === selected;
+                v.selected = v.text.toString() === selected.toString();
             });
             return;
         } else {

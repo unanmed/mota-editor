@@ -63,7 +63,7 @@
                                 :disabled="!!selection.disabled"
                                 @change="save(true)"
                             >
-                                {{ selection.text }}
+                                {{ selection.show || selection.text }}
                                 <span
                                     v-if="selection.warn"
                                     class="select-warn"
@@ -138,7 +138,7 @@
                             v-for="selection of selectList"
                             :checked="selection.root.selected"
                             @click="onSingleChange(selection)"
-                            >{{ selection.text }}
+                            >{{ selection.show || selection.text }}
                         </a-radio>
                     </div>
                 </div>
@@ -164,6 +164,7 @@ import { AudioPreviewer } from './preview';
 interface DecoratedString {
     root: Select;
     text: string;
+    show?: string;
     disabled?: boolean;
     warn?: string;
     preview?: 'image' | 'audio';
@@ -199,7 +200,7 @@ const selectList = computed<DecoratedString[]>(() => {
             const content = applyDecorator(v, select.value.suffix);
             return content;
         } else {
-            return { root: v, text: v.text };
+            return { root: v, text: v.text, show: v.show };
         }
     });
 });
