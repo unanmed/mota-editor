@@ -67,7 +67,7 @@
                     "target": "file",
                     "multi": true,
                     "suffix": [
-                        "animate.hide()"
+                        "animate.hide().previewAnimate()"
                     ],
                     "path": "project/animates"
                 },
@@ -80,10 +80,10 @@
                     "target": "file",
                     "multi": true,
                     "suffix": [
-                        "mp3",
-                        "ogg.warn('IOS或MAC上无法播放!').transform(ogg, mp3)",
-                        "wav",
-                        "flac"
+                        "mp3.previewAudio()",
+                        "ogg.warn(> IOS或MAC上无法播放! <).transform(ogg, mp3).previewAudio()",
+                        "wav.previewAudio()",
+                        "flac.previewAudio()"
                     ],
                     "path": "project/bgms"
                 },
@@ -96,10 +96,10 @@
                     "target": "file",
                     "multi": true,
                     "suffix": [
-                        "mp3",
-                        "ogg.warn(> IOS或MAC上无法播放! <).transform(ogg, mp3)",
-                        "wav",
-                        "flac"
+                        "mp3.previewAudio()",
+                        "ogg.warn(> IOS或MAC上无法播放! <).transform(ogg, mp3).previewAudio()",
+                        "wav.previewAudio()",
+                        "flac.previewAudio()"
                     ],
                     "path": "project/sounds"
                 },

@@ -53,7 +53,10 @@
                     </div>
                     <a-divider class="divider"></a-divider>
                     <div class="select-selection">
-                        <div v-for="(selection, i) in selectList">
+                        <div
+                            v-for="(selection, i) in selectList"
+                            class="select-checkbox"
+                        >
                             <a-checkbox
                                 :key="selection.text"
                                 v-model:checked="selection.root.selected"
@@ -67,6 +70,20 @@
                                     >{{ selection.warn }}</span
                                 >
                             </a-checkbox>
+                            <a-button
+                                v-if="!!selection.preview"
+                                @click="changePreview(selection)"
+                                >预览</a-button
+                            >
+                            <div
+                                v-if="!!selection.previewing!.value"
+                                class="select-preview"
+                            >
+                                <img
+                                    v-if="selection.preview === 'image'"
+                                    :src="selection.previewData!.value"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -94,7 +111,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onUnmounted, ref } from 'vue';
+import { computed, nextTick, onUnmounted, Ref, ref } from 'vue';
 import Multi from '../multi/multi.vue';
 import {
     FiledSelectSuffix,
@@ -111,6 +128,9 @@ interface DecoratedString {
     text: string;
     disabled?: boolean;
     warn?: string;
+    preview?: 'image' | 'audio';
+    previewing?: Ref<boolean>;
+    previewData?: Ref<string>;
 }
 
 const props = defineProps<{
@@ -157,12 +177,15 @@ function applyDecorator(
     const decorator = fn[suffix];
     const data: DecoratedString = {
         root: str,
-        text: str.text
+        text: str.text,
+        previewing: ref(false),
+        previewData: ref('')
     };
     decorator.forEach(v => {
         if (v.fn === 'uncancelable' && str.selected) data.disabled = true;
         if (v.fn === 'hide') data.text = data.text.replace(`.${suffix}`, '');
         if (v.fn === 'warn') data.warn = v.params[0];
+        if (v.fn === 'previewImage') data.preview = 'image';
     });
 
     return data;
@@ -202,6 +225,25 @@ const singleSave = debounce(save, 100);
 function onSingleChange(str: DecoratedString) {
     select.value.updateSelected(str.text);
     singleSave();
+}
+
+function getAbsolutePath(file: string) {
+    return select.value.base + '/' + select.value.info.path + '/' + file;
+}
+
+async function getImageBase64Data(file: string, str: DecoratedString) {
+    const path = getAbsolutePath(file);
+    const suffix = file.split('.').at(-1)!;
+    const base64 = await window.editor.file.read(path, 'base64');
+    const res = `data:image/${suffix};base64,${base64}`;
+    str.previewData!.value = res;
+}
+
+function changePreview(selection: DecoratedString) {
+    selection.previewing!.value = !selection.previewing!.value;
+    if (selection.preview === 'image') {
+        getImageBase64Data(selection.text, selection);
+    }
 }
 
 onUnmounted(() => {
@@ -303,6 +345,26 @@ onUnmounted(() => {
     .radio {
         margin: 4px 12px;
         font-size: 16px;
+    }
+}
+
+.select-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 24px;
+    flex-wrap: wrap;
+
+    :deep(.ant-btn) {
+        font-size: 16px;
+    }
+}
+
+.select-preview {
+    width: 100%;
+
+    img {
+        max-width: 100%;
     }
 }
 </style>
