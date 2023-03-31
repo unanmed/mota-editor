@@ -1,0 +1,741 @@
+{
+    "type": "eventBlock",
+    "color": "#d4d",
+    "text": "入口方块",
+    "data": {
+        "common": {
+            "type": "entry-common",
+            "text": "事件",
+            "params": [
+                {
+                    "type": "checkbox",
+                    "key": "trigger",
+                    "text": "覆盖触发器"
+                },
+                {
+                    "type": "checkbox",
+                    "key": "enable",
+                    "text": "启用",
+                    "default": true
+                },
+                {
+                    "type": "select",
+                    "text": "通行状态",
+                    "key": "noPass",
+                    "value": [
+                        null,
+                        false,
+                        true
+                    ],
+                    "show": [
+                        "不改变",
+                        "不可通行",
+                        "可以通行"
+                    ],
+                    "default": null
+                },
+                {
+                    "type": "checkbox",
+                    "key": "displayDamage",
+                    "text": "显伤",
+                    "default": true
+                },
+                {
+                    "type": "number",
+                    "key": "opacity",
+                    "text": "不透明度",
+                    "default": 1
+                },
+                "!!newLine",
+                {
+                    "type": "number",
+                    "key": "blur",
+                    "text": "虚化"
+                },
+                {
+                    "type": "number",
+                    "key": "hue",
+                    "text": "色相"
+                },
+                {
+                    "type": "number",
+                    "key": "grayscale",
+                    "text": "灰度"
+                },
+                {
+                    "type": "checkbox",
+                    "key": "invert",
+                    "text": "反色"
+                },
+                {
+                    "type": "number",
+                    "key": "shadow",
+                    "text": "阴影"
+                },
+                {
+                    "type": "block",
+                    "key": "data"
+                }
+            ],
+            "format": [
+                "if (params.sameWithDefaults()) return p.data;",
+                "else return params.replace({",
+                "    trigger: p.trigger ? 'action' : null,",
+                "})",
+                "    .wrap(['blur', 'hue', 'grayscale', 'invert', 'shadow'], 'filter')",
+                "    .format();"
+            ]
+        },
+        "autoEvent": {
+            "type": "entry-autoEvent",
+            "text": "自动事件",
+            "params": [
+                {
+                    "type": "text",
+                    "key": "condition",
+                    "default": "flag:__door__===2",
+                    "error": [
+                        {
+                            "regexp": "flag:__door__",
+                            "throw": [
+                                "Error: 请修改开门变量__door__，如door1，door2，door3等依次向后。",
+                                "请勿存在两个门使用相同的开门变量。"
+                            ]
+                        }
+                    ]
+                },
+                "!!newLine",
+                {
+                    "type": "number",
+                    "key": "priority",
+                    "text": "优先级"
+                },
+                {
+                    "type": "checkbox",
+                    "key": "currentFloor",
+                    "text": "仅在本层检测",
+                    "default": true
+                },
+                {
+                    "type": "checkbox",
+                    "key": "delayExecute",
+                    "text": "事件流中延迟执行"
+                },
+                {
+                    "type": "checkbox",
+                    "key": "multiExecute",
+                    "text": "允许多次执行"
+                },
+                {
+                    "type": "block",
+                    "key": "data"
+                }
+            ]
+        },
+        "level": {
+            "type": "entry-level",
+            "text": "等级提升",
+            "params": [
+                {
+                    "type": "block",
+                    "require": [
+                        "levelCase"
+                    ]
+                }
+            ],
+            "format": [
+                "return p.$0;"
+            ]
+        },
+        "shop": {
+            "type": "entry-shop",
+            "text": "全局商店",
+            "params": [
+                {
+                    "type": "block",
+                    "require": [
+                        "shopSub",
+                        "shopItem",
+                        "shopCommonEvent"
+                    ]
+                }
+            ],
+            "format": [
+                "return p.$0;"
+            ]
+        },
+        "beforeBattle": {
+            "type": "entry-beforeBattle",
+            "text": "战斗开始前",
+            "params": [
+                {
+                    "type": "block"
+                }
+            ],
+            "format": [
+                "return p.$0;"
+            ]
+        },
+        "afterBattle": {
+            "type": "entry-afterBattle",
+            "text": "战斗结束后",
+            "params": [
+                {
+                    "type": "block"
+                }
+            ],
+            "format": [
+                "return p.$0;"
+            ]
+        },
+        "afterGetItem": {
+            "type": "entry-afterGetItem",
+            "text": "获取道具后",
+            "params": [
+                {
+                    "type": "checkbox",
+                    "key": "disableOnGentleClick",
+                    "text": "轻按时不触发",
+                    "default": false
+                },
+                {
+                    "type": "block",
+                    "key": "data"
+                }
+            ],
+            "format": [
+                "if (p.$0) return params.format();",
+                "else return p.$1;"
+            ]
+        },
+        "afterOpenDoor": {
+            "type": "entry-afterOpenDoor",
+            "text": "打开门后",
+            "params": [
+                {
+                    "type": "block"
+                }
+            ],
+            "format": [
+                "return p.$0;"
+            ]
+        },
+        "firstArrive": {
+            "type": "entry-firstArrive",
+            "text": "首次到达楼层",
+            "params": [
+                {
+                    "type": "block"
+                }
+            ],
+            "format": [
+                "return p.$0;"
+            ]
+        },
+        "eachArrive": {
+            "type": "entry-eachArrive",
+            "text": "每次到达楼层",
+            "params": [
+                {
+                    "type": "block"
+                }
+            ],
+            "format": [
+                "return p.$0;"
+            ]
+        },
+        "changeFloor": {
+            "type": "entry-changeFloor",
+            "text": "楼层传送",
+            "dblClick": {
+                "event": "selectPoint",
+                "confirm": [
+                    "p.$0 = 'floorId';",
+                    "p.$1 = data.floorId;",
+                    "p.$2 = 'loc';",
+                    "p.$3 = data.x;",
+                    "p.$4 = data.y;"
+                ],
+                "params": [
+                    "p.$3",
+                    "p.$4",
+                    false
+                ]
+            },
+            "params": [
+                {
+                    "type": "select",
+                    "text": "目标楼层",
+                    "key": "floorId",
+                    "value": [
+                        "floorId",
+                        ":before",
+                        ":next",
+                        ":now"
+                    ],
+                    "show": [
+                        "楼层ID",
+                        "前一层",
+                        "后一层",
+                        "当前层"
+                    ],
+                    "default": "floorId"
+                },
+                {
+                    "type": "text",
+                    "hide": "$0 !== 'floorId'",
+                    "default": "MTx"
+                },
+                {
+                    "type": "select",
+                    "text": "目标位置",
+                    "key": "stair",
+                    "value": [
+                        "loc",
+                        "upFloor",
+                        "downFloor",
+                        "none",
+                        ":symmetry",
+                        ":symmetry_x",
+                        ":symmetry_y",
+                        "flyPoint"
+                    ],
+                    "show": [
+                        "坐标",
+                        "上楼梯",
+                        "下楼梯",
+                        "保持不变",
+                        "中心对称点",
+                        "x对称点",
+                        "y对称点",
+                        "楼传落点"
+                    ],
+                    "default": "loc"
+                },
+                {
+                    "type": "number",
+                    "text": "x",
+                    "default": 0
+                },
+                {
+                    "type": "number",
+                    "text": "y",
+                    "default": 0
+                },
+                {
+                    "type": "select",
+                    "text": "勇士朝向",
+                    "key": "direction",
+                    "value": [
+                        "none",
+                        "up",
+                        "down",
+                        "left",
+                        "right",
+                        ":left",
+                        ":right",
+                        ":back",
+                        ":hero",
+                        ":backhero"
+                    ],
+                    "show": [
+                        "保持不变",
+                        "向上",
+                        "向下",
+                        "向左",
+                        "向右",
+                        "左转",
+                        "右转",
+                        "反向",
+                        "勇士方向",
+                        "勇士反向"
+                    ],
+                    "default": "none"
+                },
+                {
+                    "type": "number",
+                    "key": "time",
+                    "text": "动画时间",
+                    "hideJSON": "$6 === null || $6 === void 0",
+                    "default": null
+                },
+                {
+                    "type": "select",
+                    "key": "ignoreChangeFloor",
+                    "text": "穿透性",
+                    "hideJSON": "$7 === 'none'",
+                    "value": [
+                        "none",
+                        "true",
+                        "false"
+                    ],
+                    "show": [
+                        "全局默认值",
+                        "可穿透",
+                        "不可穿透"
+                    ],
+                    "default": "none"
+                }
+            ],
+            "format": [
+                "const res = {};",
+                "if (p.floorId === 'floorId') res.loc = $1;",
+                "else res.floorId = p.floorId;",
+                "if (p.stair !== 'none') {",
+                "    if (p.stair === 'loc') res.loc = [p.$3, p.$4];",
+                "    else res.stair = p.stair;",
+                "}",
+                "if (p.direction !== 'none') res.direction = p.direction;",
+                "if (p.time !== null && p.time !== void 0) res.time = p.time;",
+                "if (p.$7 !== 'none') {",
+                "    if (p.$7 === 'true') res.ignoreChangeFloor = true;",
+                "    else res.ignoreChangeFloor = false;",
+                "}",
+                "return res;"
+            ]
+        },
+        "commonEvent": {
+            "type": "entry-commonEvent",
+            "text": "公共事件",
+            "params": [
+                {
+                    "type": "block"
+                }
+            ],
+            "format": [
+                "return p.$0;"
+            ]
+        },
+        "item": {
+            "type": "entry-item",
+            "text": "使用道具事件",
+            "params": [
+                {
+                    "type": "block"
+                }
+            ],
+            "format": [
+                "return p.$0;"
+            ]
+        },
+        "levelChoose": {
+            "type": "entry-levelChoose",
+            "text": "难度分歧",
+            "params": [
+                {
+                    "type": "block",
+                    "require": [
+                        "levelChooseChoice"
+                    ]
+                }
+            ],
+            "format": [
+                "return p.$0;"
+            ]
+        },
+        "floorPartitions": {
+            "type": "entry-floorPartitions",
+            "text": "高层塔分区管理",
+            "params": [
+                {
+                    "type": "block",
+                    "require": [
+                        "floorPartitionsItem"
+                    ]
+                }
+            ],
+            "format": [
+                "return p.$0;"
+            ]
+        },
+        "equip": {
+            "type": "entry-equip",
+            "text": "装备属性",
+            "params": [
+                {
+                    "type": "text",
+                    "text": "类型",
+                    "key": "type",
+                    "default": "0",
+                    "error": [
+                        {
+                            "regexp": "^$",
+                            "throw": [
+                                "Error: 请输入装备类型，输入数字表示装备可以装备到第n - 1个装备槽，",
+                                "输入字符串表示可以装备到相应名称的装备槽"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "text",
+                    "text": "打怪动画(仅装备至第一个装备孔时有效)",
+                    "key": "animate",
+                    "default": ""
+                },
+                {
+                    "type": "block",
+                    "key": "value",
+                    "text": "数值提升项",
+                    "require": [
+                        "equipKnown",
+                        "equipUnknown"
+                    ]
+                },
+                {
+                    "type": "block",
+                    "key": "percentage",
+                    "text": "百分比提升项",
+                    "require": [
+                        "equipKnown",
+                        "equipUnknown"
+                    ]
+                },
+                {
+                    "type": "block",
+                    "key": "equipEvent",
+                    "text": "穿上时事件",
+                    "hideJSON": "no data"
+                },
+                {
+                    "type": "block",
+                    "key": "unequipEvent",
+                    "text": "脱下时事件",
+                    "hideJSON": "no data"
+                }
+            ],
+            "format": [
+                "const res = {};",
+                "const type = parseInt(p.type);",
+                "if (!isNaN(type)) res.type = type;",
+                "else res.type = p.type;",
+                "if (p.animate !== '') res.animate = p.animate;",
+                "res.value = p.value;",
+                "res.percentage = p.percentage;",
+                "if (!!p.equipEvent?.length) res.equipEvent = p.equipEvent;",
+                "if (!!p.unequipEvent?.length) res.unequipEvent = p.unequipEvent;",
+                "return res;"
+            ]
+        },
+        "floorImage": {
+            "type": "entry-floorImage",
+            "text": "楼层贴图",
+            "params": [
+                {
+                    "type": "block",
+                    "require": [
+                        "floorImageList"
+                    ]
+                }
+            ],
+            "format": [
+                "return p.$0;"
+            ]
+        },
+        "doorInfo": {
+            "type": "entry-doorInfo",
+            "text": "门信息",
+            "params": [
+                {
+                    "type": "number",
+                    "text": "开关门时间",
+                    "key": "time",
+                    "default": 160,
+                    "replace": [
+                        [
+                            null,
+                            0
+                        ]
+                    ]
+                },
+                {
+                    "type": "text",
+                    "text": "开门音效",
+                    "key": "openSound",
+                    "default": "door.mp3",
+                    "hideJSON": "$1 === ''"
+                },
+                {
+                    "type": "text",
+                    "text": "关门音效",
+                    "key": "closeSound",
+                    "default": "door.mp3",
+                    "hideJSON": "$2 === ''"
+                },
+                {
+                    "type": "block",
+                    "text": "需要钥匙",
+                    "key": "keys",
+                    "require": [
+                        "doorKeyKnown",
+                        "doorKeyUnknown"
+                    ]
+                },
+                "如需撞到开门还需要把图块触发器改成 openDoor",
+                {
+                    "type": "block",
+                    "key": "afterOpenDoor",
+                    "text": "开门后事件",
+                    "hideJSON": "no data"
+                }
+            ],
+            "format": [
+                "return params.replace('time', !p.time ? 0 : p.time)",
+                "    .filter(['openSound', 'closeSound'], '')",
+                "    .filter('afterOpenDoor', v => v.length !== 0);"
+            ]
+        },
+        "faceIds": {
+            "type": "entry-faceIds",
+            "text": "行走图朝向",
+            "params": [
+                {
+                    "type": "text",
+                    "text": "向下ID",
+                    "key": "down",
+                    "hideJSON": "$0 === ''"
+                },
+                {
+                    "type": "text",
+                    "text": "向左ID",
+                    "key": "left",
+                    "hideJSON": "$1 === ''"
+                },
+                {
+                    "type": "text",
+                    "text": "向右ID",
+                    "key": "right",
+                    "hideJSON": "$2 === ''"
+                },
+                {
+                    "type": "text",
+                    "text": "向上ID",
+                    "key": "up",
+                    "hideJSON": "$3 === ''"
+                }
+            ],
+            "format": [
+                "return params.filter('');"
+            ]
+        },
+        "mainStyle": {
+            "type": "entry-mainStyle",
+            "text": "主要样式",
+            "params": [
+                {
+                    "type": "text",
+                    "text": "标题界面背景图",
+                    "key": "startBackground"
+                },
+                "!!newLine",
+                {
+                    "type": "text",
+                    "text": "竖屏标题界面背景图",
+                    "key": "startVerticalBackground"
+                },
+                "!!newLine",
+                {
+                    "type": "text",
+                    "text": "标题样式",
+                    "key": "startLogoStyle"
+                },
+                "!!newLine",
+                {
+                    "type": "text",
+                    "text": "标题按钮样式",
+                    "key": "startButtonsStyle"
+                },
+                "!!newLine",
+                {
+                    "type": "text",
+                    "text": "横屏状态栏背景",
+                    "key": "statusLeftBackground"
+                },
+                "!!newLine",
+                {
+                    "type": "text",
+                    "text": "竖屏状态栏背景",
+                    "key": "statusTopBackground"
+                },
+                "!!newLine",
+                {
+                    "type": "text",
+                    "text": "竖屏工具栏背景",
+                    "key": "toolsBackground"
+                },
+                "!!newLine",
+                {
+                    "type": "text",
+                    "text": "楼层切换样式",
+                    "key": "floorChangingStyle"
+                },
+                "!!newLine",
+                {
+                    "type": "color",
+                    "text": "状态栏颜色",
+                    "key": "statusBarColor"
+                },
+                "!!newLine",
+                {
+                    "type": "color",
+                    "text": "边框颜色",
+                    "key": "borderColor"
+                },
+                "!!newLine",
+                {
+                    "type": "color",
+                    "text": "选中框颜色",
+                    "key": "selectColor"
+                },
+                "!!newLine",
+                {
+                    "type": "text",
+                    "text": "全局字体",
+                    "key": "font"
+                }
+            ]
+        },
+        "nameMap": {
+            "type": "entry-nameMap",
+            "text": "文件别名设置",
+            "params": [
+                {
+                    "type": "block",
+                    "require": [
+                        "nameMapList"
+                    ]
+                }
+            ],
+            "format": [
+                "return p.$0;"
+            ]
+        },
+        "splitImage": {
+            "type": "entry-splitImage",
+            "text": "图片切分",
+            "params": [
+                {
+                    "type": "block",
+                    "require": [
+                        "splitImageList"
+                    ]
+                }
+            ],
+            "format": [
+                "return p.$0;"
+            ]
+        },
+        "default": {
+            "type": "entry",
+            "text": "编辑事件",
+            "params": [
+                {
+                    "type": "block"
+                }
+            ],
+            "format": [
+                "return p.$0;"
+            ]
+        }
+    }
+}
