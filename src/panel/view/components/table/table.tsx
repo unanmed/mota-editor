@@ -87,6 +87,9 @@ export function getTableObject<T = any>(uri: Uri, data?: any): TableObject<T> {
     let root: any;
     let lastKey: string = '';
     for (let i = 1; i < stack.length; i++) {
+        // 避免出现读取undefined的情况
+        if (i < stack.length - 2) now[stack[i]] ??= {};
+        else now[stack[i]] ??= null;
         now = now[stack[i]];
         info = info.data[stack[i]];
         lastKey = stack[i];

@@ -2,6 +2,7 @@
     "type": "eventBlock",
     "color": "#d4d",
     "text": "入口方块",
+    "id": "entry",
     "data": {
         "common": {
             "type": "entry-common",

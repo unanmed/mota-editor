@@ -16,7 +16,10 @@ contextBridge.exposeInMainWorld('editor', {
         setInfo: info => ipcRenderer.invoke('project.setInfo', info)
     },
     extra: {
-        get: (path, encoding) => ipcRenderer.invoke('extra.get', path, encoding)
+        get: (path, encoding) =>
+            ipcRenderer.invoke('extra.get', path, encoding),
+        readl: (path, encoding) =>
+            ipcRenderer.invoke('extra.readl', path, encoding)
     },
     file: {
         read: (path, options) => ipcRenderer.invoke('file.read', path, options),

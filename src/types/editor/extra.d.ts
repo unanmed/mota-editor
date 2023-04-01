@@ -1,4 +1,7 @@
 interface ExtraHandler {
-    get(path: string): Promise<Buffer>;
+    get(path: string): Promise<Uint8Array>;
     get(path: string, encoding: BufferEncoding): Promise<string>;
+
+    readl(dir: string): Promise<[string, Uint8Array][]>;
+    readl(dir: string, encoding: BufferEncoding): Promise<[string, string][]>;
 }
