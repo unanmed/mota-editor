@@ -1,15 +1,12 @@
-import { MotaEvent } from '../../event/event';
 import { MultiController, MultiItem } from '../multi/multi';
 
 export class EventController extends MultiController<MotaEventItem> {
     add(content: MotaEventItem) {}
 
-    remove(content: MotaEventItem) {}
-
     close(): void {}
 }
 
-export class MotaEventItem extends MultiItem<MotaEvent> {
+export class MotaEventItem extends MultiItem<any> {
     private static num: number = 0;
 
     /** 事件的数字id */

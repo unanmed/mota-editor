@@ -3,6 +3,7 @@ import { CodeController } from '../../panel/view/components/code/code';
 import { SelectionController } from '../../panel/view/components/select/select';
 import { TableProps } from '../../panel/view/components/table/table';
 import { view } from './control';
+import { EventConfigController } from '../../panel/view/components/event/config/config';
 
 export type PanelType = keyof PanelProps;
 
@@ -10,6 +11,8 @@ export interface PanelProps {
     table: TableProps;
     code: CodeController;
     select: SelectionController;
+    config: null;
+    eventConfig: EventConfigController;
 }
 
 export class Panel<T extends PanelType = PanelType> {
@@ -56,13 +59,11 @@ export class Panel<T extends PanelType = PanelType> {
     }
 
     focus() {
-        let index = -1;
         view.list.forEach((v, i) => {
             v.focused.value = false;
             if (!v.toped) {
                 v.zIndex.value = 0;
             }
-            if (v === this) index = i;
         });
         this.focused.value = true;
         this.zIndex.value = 1;

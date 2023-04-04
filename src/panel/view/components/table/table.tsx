@@ -28,6 +28,7 @@ export interface TableProps {
     data: TableElement;
     n: number;
     path: string;
+    memo?: boolean;
 }
 
 /**
@@ -47,6 +48,8 @@ export function TableRenderer(props: TableProps) {
                 data={data}
                 n={props.n}
                 path={`${props.path}${props.path ? '.' : ''}${props.keys}`}
+                useSlot={false}
+                memo={!!props.memo}
             ></Table>
         );
     } else {

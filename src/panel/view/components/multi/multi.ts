@@ -4,8 +4,17 @@ import { ref, Ref, shallowReactive } from 'vue';
 import { EventEmitter } from '../../../../editor/utils/event';
 import { Panel } from '../../../../editor/view/panel';
 
-export abstract class MultiController<Item extends MultiItem = MultiItem> {
+interface MultiControllerEvent {
+    select: (...params: any[]) => void;
+    remove: (...params: any[]) => void;
+}
+
+export abstract class MultiController<
+    Item extends MultiItem = MultiItem
+> extends EventEmitter<MultiControllerEvent> {
     protected static num = 0;
+
+    selectStack: string[] = [];
 
     list: Item[] = shallowReactive([]);
     selected: Ref<number> = ref(-1);
@@ -17,13 +26,24 @@ export abstract class MultiController<Item extends MultiItem = MultiItem> {
 
     abstract add(content: any): any;
 
-    abstract remove(content: any): any;
-
     abstract close(): void;
+
+    remove(index: number, ...params: any[]) {
+        const item = this.list[index];
+        this.emit('remove', index, ...params);
+        this.list.splice(index, 1);
+        this.selectStack = this.selectStack.filter(
+            v => v !== item.uri.toString()
+        );
+        if (this.selected.value === index) {
+            const index = this.indexOf(this.selectStack.pop() ?? '');
+            if (this.list[index]) this.select(index);
+        }
+    }
 
     indexOf(uri: Uri | string | Item) {
         if (typeof uri === 'string') {
-            return this.list.findIndex(v => v.uri.path === uri);
+            return this.list.findIndex(v => v.uri.toString() === uri);
         } else if (uri instanceof Uri) {
             return this.list.findIndex(
                 v => v.uri.toString() === uri.toString()
@@ -31,6 +51,15 @@ export abstract class MultiController<Item extends MultiItem = MultiItem> {
         } else {
             return this.list.indexOf(uri);
         }
+    }
+
+    select(index: number, ...params: any[]) {
+        const file = this.list[index];
+        this.emit('select', index, ...params);
+        this.selectStack.push(file.uri.toString());
+        if (this.selectStack.length > 50) this.selectStack.shift();
+        this.selected.value = index;
+        this.panel?.focus();
     }
 }
 

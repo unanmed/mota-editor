@@ -38,25 +38,10 @@ export class SelectionController extends MultiController<Selection> {
         }
     }
 
-    remove(index: number) {
-        const select = this.list[index];
-        this.list.splice(index, 1);
-
-        this.selectStack = this.selectStack.filter(v => v !== select.uri.path);
-        if (this.selected.value === index) {
-            const index = this.indexOf(this.selectStack.pop() ?? '');
-            if (this.list[index]) this.select(index);
-        }
-    }
-
     close(): void {
         const index = selectionList.indexOf(this);
         if (index === -1 || index === 0) return;
         selectionList.splice(index, 1);
-    }
-
-    select(index: number) {
-        this.selected.value = index;
     }
 }
 

@@ -2,6 +2,7 @@ import { Ref, ref, shallowReactive } from 'vue';
 import * as monaco from 'monaco-editor';
 import { Panel } from '../../../../editor/view/panel';
 import { MultiController, MultiItem } from '../multi/multi';
+import { spliceElement } from '../../../../editor/utils/utils';
 
 type CodeFormat = 'javascript' | 'text' | 'json';
 
@@ -14,6 +15,19 @@ export class CodeController extends MultiController<CodeFile> {
     constructor() {
         super();
         codeList.push(this);
+        this.on(
+            'select',
+            (index, view: monaco.editor.ICodeEditorViewState | null) => {
+                if (view) this.list[this.selected.value].view = view;
+            }
+        );
+        this.on(
+            'remove',
+            (index, view: monaco.editor.ICodeEditorViewState | null) => {
+                const file = this.list[index];
+                if (view) file.view = view;
+            }
+        );
     }
 
     async add(path: string | CodeFile) {
@@ -44,30 +58,10 @@ export class CodeController extends MultiController<CodeFile> {
         }
     }
 
-    remove(index: number, view?: monaco.editor.ICodeEditorViewState | null) {
-        const file = this.list[index];
-        if (view) file.view = view;
-        this.list.splice(index, 1);
-        this.selectStack = this.selectStack.filter(v => v !== file.uri.path);
-        if (this.selected.value === index) {
-            const index = this.indexOf(this.selectStack.pop() ?? '');
-            if (this.list[index]) this.select(index);
-        }
-    }
-
     close() {
         const index = codeList.indexOf(this);
         if (index === -1 || index === 0) return;
         codeList.splice(index, 1);
-    }
-
-    select(index: number, view?: monaco.editor.ICodeEditorViewState | null) {
-        const file = this.list[index];
-        if (view) this.list[this.selected.value].view = view;
-        this.selectStack.push(file.uri.path);
-        if (this.selectStack.length > 50) this.selectStack.shift();
-        this.selected.value = index;
-        this.panel?.focus();
     }
 }
 
@@ -82,6 +76,7 @@ export class CodeFile extends MultiItem<string> {
     view?: monaco.editor.ICodeEditorViewState;
 
     canWatch: boolean = true;
+    extraLib: string[] = [];
 
     constructor(
         name: string,
@@ -93,7 +88,7 @@ export class CodeFile extends MultiItem<string> {
         this.name = name;
         this.content = content;
         this.format = format;
-        this.model = monaco.editor.createModel(this.content, format);
+        this.model = monaco.editor.createModel(this.content, format, uri);
         this.model.setValue(content);
         const f = fileMap.get(uri.toString());
         if (!f) fileMap.set(uri.toString(), this);
@@ -110,6 +105,18 @@ export class CodeFile extends MultiItem<string> {
     update(content: string): void {
         this.model.setValue(content);
         this.saved.value = true;
+    }
+
+    addExtraLib(...content: string[]) {
+        this.extraLib.push(...content);
+    }
+
+    removeExtraLib(content: string) {
+        spliceElement(this.extraLib, content);
+    }
+
+    setExtraLib(content: string[]) {
+        this.extraLib = content;
     }
 }
 

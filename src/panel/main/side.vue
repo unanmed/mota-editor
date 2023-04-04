@@ -7,6 +7,7 @@
             <file-add-outlined class="panel-icon" />
             <project-outlined class="panel-icon" />
             <gateway-outlined class="panel-icon" />
+            <partition-outlined class="panel-icon" @click="openConfig" />
         </div>
         <div id="bottom">
             <user-outlined class="panel-icon" />
@@ -24,9 +25,10 @@ import {
     ProjectOutlined,
     GatewayOutlined,
     UserOutlined,
-    SettingOutlined
+    SettingOutlined,
+    PartitionOutlined
 } from '@ant-design/icons-vue';
-import { addData } from '../view/control';
+import { addData, openConfig } from '../view/control';
 </script>
 
 <style lang="less" scoped>

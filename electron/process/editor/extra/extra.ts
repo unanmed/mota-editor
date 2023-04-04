@@ -15,21 +15,30 @@ export async function getExtraFile(path: string, encoding?: BufferEncoding) {
 export async function readExtraDirOrDefualt(
     win: EditorWindow,
     dir: string,
+    defaults?: string,
     encoding?: BufferEncoding
 ) {
+    const output = async (root: string, p: string[]) => {
+        const list = [];
+        for await (const o of p) {
+            if (!(await stat(resolve(root, o))).isFile()) continue;
+            list.push(o);
+        }
+        return Promise.all(
+            list.map(v =>
+                Promise.all([v, readFile(resolve(root, v), encoding)])
+            )
+        );
+    };
     try {
         const root = resolve(win.project!.dir, dir);
         const p = await readdir(root);
-        return Promise.all(
-            p.map(v => Promise.all([v, readFile(resolve(root, v), encoding)]))
-        );
+        return output(root, p);
     } catch {
         const client = import.meta.env.DEV ? 'public' : 'resources/assets';
-        const path = resolve(root, client, dir);
+        const path = resolve(root, client, defaults ?? dir);
         const p = await readdir(path);
-        return Promise.all(
-            p.map(v => Promise.all([v, readFile(resolve(path, v), encoding)]))
-        );
+        return output(path, p);
     }
 }
 
@@ -37,10 +46,10 @@ export function injectExtraInterface() {
     ipcMain.handle('extra.get', (e, path, encoding) =>
         getExtraFile(path, encoding)
     );
-    ipcMain.handle('extra.reado', (e, path, encoding) => {
+    ipcMain.handle('extra.readl', (e, path, defaults, encoding) => {
         const editor = controller.find(e.sender);
         if (!editor || !(editor instanceof EditorWindow)) return [];
-        return readExtraDirOrDefualt(editor, path, encoding);
+        return readExtraDirOrDefualt(editor, path, defaults, encoding);
     });
 
     ipcMain.handle('file.read', (e, path, options) => readFile(path, options));

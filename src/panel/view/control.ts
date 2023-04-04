@@ -4,6 +4,7 @@ import { Panel } from '../../editor/view/panel';
 import { TableElement } from './components/table/table';
 import { CodeController } from './components/code/code';
 import { SelectionController } from './components/select/select';
+import { EventConfigController } from './components/event/config/config';
 
 export function addData() {
     if (!projectInfo.project) return alert('请先打开一个魔塔项目');
@@ -13,7 +14,8 @@ export function addData() {
             data: tables.data,
             n: 0,
             root: 'data',
-            path: ''
+            path: '',
+            memo: true
         })
             .setDefaultSize(500, 500)
             .setMaxSize(1000)
@@ -47,4 +49,18 @@ export function showSelection(selection: SelectionController) {
     selection.panel = panel;
     view.add(panel.setMinSize(400).setDefaultSize(600, 500).focus());
     selection.added = true;
+}
+
+export function openConfig() {
+    const panel = new Panel('config', '编辑器配置', null);
+    view.add(panel.setDefaultSize(500, 500).focus());
+}
+
+export function openEventConfig() {
+    const config = new EventConfigController();
+    const panel = new Panel('eventConfig', '事件编辑器配置', config);
+    view.add(panel.setDefaultSize(700, 500).focus());
+    config.panel = panel;
+    config.added = true;
+    return config;
 }

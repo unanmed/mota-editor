@@ -1,6 +1,6 @@
 {
     "type": "eventBlock",
-    "color": "#d4d",
+    "color": "#dd44dd",
     "text": "入口方块",
     "id": "entry",
     "data": {
@@ -47,7 +47,10 @@
                     "text": "不透明度",
                     "default": 1
                 },
-                "!!newLine",
+                {
+                    "type": "comment",
+                    "text": "!!newLine"
+                },
                 {
                     "type": "number",
                     "key": "blur",
@@ -105,7 +108,10 @@
                         }
                     ]
                 },
-                "!!newLine",
+                {
+                    "type": "comment",
+                    "text": "!!newLine"
+                },
                 {
                     "type": "number",
                     "key": "priority",
@@ -284,7 +290,6 @@
                 },
                 {
                     "type": "text",
-                    "hide": "$0 !== 'floorId'",
                     "default": "MTx"
                 },
                 {
@@ -357,14 +362,12 @@
                     "type": "number",
                     "key": "time",
                     "text": "动画时间",
-                    "hideJSON": "$6 === null || $6 === void 0",
                     "default": null
                 },
                 {
                     "type": "select",
                     "key": "ignoreChangeFloor",
                     "text": "穿透性",
-                    "hideJSON": "$7 === 'none'",
                     "value": [
                         "none",
                         "true",
@@ -572,7 +575,10 @@
                         "doorKeyUnknown"
                     ]
                 },
-                "如需撞到开门还需要把图块触发器改成 openDoor",
+                {
+                    "type": "comment",
+                    "text": "如需撞到开门还需要把图块触发器改成 openDoor"
+                },
                 {
                     "type": "block",
                     "key": "afterOpenDoor",
@@ -628,67 +634,100 @@
                     "text": "标题界面背景图",
                     "key": "startBackground"
                 },
-                "!!newLine",
+                {
+                    "type": "comment",
+                    "text": "!!newLine"
+                },
                 {
                     "type": "text",
                     "text": "竖屏标题界面背景图",
                     "key": "startVerticalBackground"
                 },
-                "!!newLine",
+                {
+                    "type": "comment",
+                    "text": "!!newLine"
+                },
                 {
                     "type": "text",
                     "text": "标题样式",
                     "key": "startLogoStyle"
                 },
-                "!!newLine",
+                {
+                    "type": "comment",
+                    "text": "!!newLine"
+                },
                 {
                     "type": "text",
                     "text": "标题按钮样式",
                     "key": "startButtonsStyle"
                 },
-                "!!newLine",
+                {
+                    "type": "comment",
+                    "text": "!!newLine"
+                },
                 {
                     "type": "text",
                     "text": "横屏状态栏背景",
                     "key": "statusLeftBackground"
                 },
-                "!!newLine",
+                {
+                    "type": "comment",
+                    "text": "!!newLine"
+                },
                 {
                     "type": "text",
                     "text": "竖屏状态栏背景",
                     "key": "statusTopBackground"
                 },
-                "!!newLine",
+                {
+                    "type": "comment",
+                    "text": "!!newLine"
+                },
                 {
                     "type": "text",
                     "text": "竖屏工具栏背景",
                     "key": "toolsBackground"
                 },
-                "!!newLine",
+                {
+                    "type": "comment",
+                    "text": "!!newLine"
+                },
                 {
                     "type": "text",
                     "text": "楼层切换样式",
                     "key": "floorChangingStyle"
                 },
-                "!!newLine",
                 {
-                    "type": "color",
+                    "type": "comment",
+                    "text": "!!newLine"
+                },
+                {
+                    "type": "colora",
                     "text": "状态栏颜色",
                     "key": "statusBarColor"
                 },
-                "!!newLine",
                 {
-                    "type": "color",
+                    "type": "comment",
+                    "text": "!!newLine"
+                },
+                {
+                    "type": "colora",
                     "text": "边框颜色",
                     "key": "borderColor"
                 },
-                "!!newLine",
                 {
-                    "type": "color",
+                    "type": "comment",
+                    "text": "!!newLine"
+                },
+                {
+                    "type": "colora",
                     "text": "选中框颜色",
                     "key": "selectColor"
                 },
-                "!!newLine",
+                {
+                    "type": "comment",
+                    "text": "!!newLine"
+                },
                 {
                     "type": "text",
                     "text": "全局字体",
@@ -726,8 +765,8 @@
                 "return p.$0;"
             ]
         },
-        "default": {
-            "type": "entry",
+        "defaultEntry": {
+            "type": "entry-default",
             "text": "编辑事件",
             "params": [
                 {

@@ -11,7 +11,10 @@ export type MotaEventParamType =
     | 'json'
     | 'checkbox'
     | 'select'
-    | 'color';
+    | 'colors'
+    | 'colora'
+    | 'comment'
+    | 'block';
 
 export interface MotaEventParamError {
     regexp: string;
@@ -39,58 +42,30 @@ export interface MotaEventDblClickData {
 export interface MotaEventInfo {
     type: string;
     text?: string;
-    params?: (MotaEventParam | string)[];
+    params?: MotaEventParam[];
     dblClick?: MotaEventDblClickData[];
     format?: string[];
 }
 
-interface MotaEventHandler {}
+export const typeName: Record<MotaEventParamType, string> = {
+    number: '数字',
+    checkbox: '布尔值',
+    code: 'js代码',
+    json: 'json对象',
+    select: '单选框',
+    colors: '字符串颜色',
+    colora: '数组型颜色',
+    comment: '文字说明',
+    text: '字符串',
+    block: '子事件块'
+};
 
-export class MotaEvent extends EventEmitter<MotaEventHandler> {
-    entry!: MotaEventOne;
+interface MotaEventEmitter {}
 
-    constructor(type?: string) {
-        super();
-        if (type) this.entry = new MotaEventOne(type);
-    }
+export class MotaEvent extends EventEmitter<MotaEventEmitter> {
+    static parse(event: any) {}
 
-    /**
-     * 转成json
-     */
-    toJSON() {}
+    set(event: any) {}
 
-    /**
-     * 设置事件的值，可以是json，事件块
-     * @param value 设置成的值
-     */
-    set(value: any) {}
-
-    /**
-     * 从一个json生成事件
-     * @param value json内容
-     */
-    static fromJSON(value: any) {
-        const event = new MotaEvent();
-        event.set(value);
-        return event;
-    }
-}
-
-class MotaEventOne<T extends string = string> {
-    /** 事件类型 */
-    type: T;
-    /** 事件参数 */
-    params: EventParams = new EventParams();
-    /** 用于v-memo优化 */
-    updateNum = 0;
-
-    constructor(type: T) {
-        this.type = type;
-    }
-
-    /**
-     * 从json解析出事件块
-     * @param value 要解析的json
-     */
-    static parse(value: any) {}
+    parse() {}
 }

@@ -1,19 +1,6 @@
 import { assignWithCheck } from '../../../editor/utils/utils';
+import { MotaEventBlock, MotaEventDefaults } from './config';
 import { MotaEventInfo, MotaEventParamType } from './event';
-
-interface EventDefaults {
-    type: 'paramDefaults';
-    data: Record<MotaEventParamType, any>;
-    blockData: Record<string, any>;
-}
-
-interface EventBlocks {
-    type: 'eventBlock';
-    data: Record<string, MotaEventInfo>;
-    color?: string;
-    text?: string;
-    id?: string;
-}
 
 interface ParsedDefaults {
     param: Partial<Record<MotaEventParamType, any>>;
@@ -46,7 +33,7 @@ export const classified: ClassifiedEvent = {
 
 export async function loadEventJSON() {
     const dir = `_editor/event`;
-    const files = await window.editor.extra.readl(dir, 'utf-8');
+    const files = await window.editor.extra.readl(dir, 'event', 'utf-8');
 
     for (const [name, content] of files) {
         try {
@@ -62,17 +49,17 @@ export async function loadEventJSON() {
     }
 }
 
-function handleDefaults(data: EventDefaults) {
+function handleDefaults(data: MotaEventDefaults) {
     assignWithCheck(defaults.param, false, data.data);
     assignWithCheck(defaults.block, false, data.blockData);
 }
 
-function handleBlock(data: EventBlocks, name: string) {
+function handleBlock(data: MotaEventBlock, name: string) {
     const id = data.id ?? name;
     const cls = (classified.cls[id] ??= {
         id,
         color: data.color ?? '#929',
-        text: data.text ?? '未命名事件',
+        text: data.text ?? '未分类事件',
         data: []
     });
     for (const [key, value] of Object.entries(data.data)) {
@@ -82,7 +69,7 @@ function handleBlock(data: EventBlocks, name: string) {
         }
         cls.data.push(key);
         if (key in classified.map) {
-            console.error(`Repeated event key or type: '${key}'.`);
+            console.warn(`Repeated event key or type: '${key}'.`);
             continue;
         }
         classified.map[key] = id;

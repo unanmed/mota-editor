@@ -22,6 +22,6 @@ export class EventEmitter<Event> {
     }
 
     emit(type: keyof Event, ...params: any[]) {
-        this.event[type]?.forEach(v => (v as Function)(...params));
+        return this.event[type]?.map(v => (v as Function)(...params));
     }
 }

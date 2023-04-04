@@ -6,6 +6,8 @@ import {
 import { PanelProps, PanelType } from './panel';
 import Code from '../../panel/view/components/code/code.vue';
 import Select from '../../panel/view/components/select/select.vue';
+import Config from '../../panel/view/components/config/config.vue';
+import EventConfig from '../../panel/view/components/event/config/config.vue';
 import { CodeController } from '../../panel/view/components/code/code';
 import { SelectionController } from '../../panel/view/components/select/select';
 
@@ -33,6 +35,10 @@ export function Panel<T extends PanelType>(props: PanelViewProps<T>) {
         return <Code code={p as CodeController} panelNum={props.num}></Code>;
     } else if (type === 'select') {
         return <Select selection={p as SelectionController}></Select>;
+    } else if (type === 'config') {
+        return <Config></Config>;
+    } else if (type === 'eventConfig') {
+        return <EventConfig config={p}></EventConfig>;
     }
     return <div></div>;
 }
