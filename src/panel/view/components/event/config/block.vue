@@ -2,7 +2,7 @@
     <div class="block-config unique-scroll">
         <span class="config-text">事件集配置项</span>
         <span class="config-text"
-            >注意这里的配置项只会影响编辑器，具体实现应该在样板中使用<span
+            >注意这里的配置项只会影响编辑器，游戏中的具体实现应该在样板中使用<span
                 style="font-family: code"
             >
                 registerEvent </span
@@ -85,8 +85,15 @@
                             :index="i"
                             :path="`${block.name}/param/${i}`"
                             :block="block"
+                            :item="item"
+                            :key="p.key ?? i"
                         ></Param>
                     </template>
+                    <div class="block-one param-add">
+                        <span class="text" @click="addParam(item)"
+                            >+ 新增参数</span
+                        >
+                    </div>
                 </Table>
             </Table>
         </Table>
@@ -125,6 +132,14 @@ async function editStringify(block: MotaEventInfo) {
         props.block.emitSave();
         return true;
     });
+}
+
+function addParam(item: MotaEventInfo) {
+    item.params?.push({
+        type: 'comment',
+        text: '显示文字'
+    });
+    props.block.emitSave();
 }
 </script>
 
@@ -178,5 +193,11 @@ async function editStringify(block: MotaEventInfo) {
     flex-basis: calc(100% - 200px);
     display: flex;
     align-items: center;
+}
+
+.param-add {
+    background-color: #2e5e26;
+    border-bottom: 1px solid #888;
+    cursor: pointer;
 }
 </style>

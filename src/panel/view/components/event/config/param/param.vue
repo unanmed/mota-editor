@@ -1,7 +1,15 @@
 <template>
     <div class="param-root">
         <Table :n="1" use-slot>
-            <template #name>第 {{ index + 1 }} 个参数</template>
+            <template #name>
+                <div class="param-name">
+                    <span>第 {{ index + 1 }} 个参数</span>
+                    <DeleteOutlined
+                        class="param-delete"
+                        @click.stop="deleteParam"
+                    />
+                </div>
+            </template>
             <div class="block-one">
                 <span class="text"><Required />参数类型</span>
                 <a-divider class="divider" type="vertical"></a-divider>
@@ -154,19 +162,25 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { MotaEventParam, typeName } from '../../../../event/event';
+import {
+    MotaEventInfo,
+    MotaEventParam,
+    typeName
+} from '../../../../event/event';
 import Table from '../../../table/table.vue';
 import { debounce } from 'lodash';
 import { Required } from '../../../../../components/utils';
 import { CodeFormat, addCodeFile } from '../../../code/code';
 import { Uri } from 'monaco-editor';
 import { EventBlockConfig } from '../../../../event/config';
+import { DeleteOutlined } from '@ant-design/icons-vue';
 
 const props = defineProps<{
     param: MotaEventParam;
     index: number;
     path: string;
     block: EventBlockConfig;
+    item: MotaEventInfo;
 }>();
 
 const defaultValue = ref(JSON.stringify(props.param.default));
@@ -218,6 +232,11 @@ function addCode(
         return true;
     });
 }
+
+function deleteParam() {
+    props.item.params?.splice(props.index, 1);
+    props.block.emitSave();
+}
 </script>
 
 <style lang="less" scoped>
@@ -252,5 +271,23 @@ function addCode(
 .block-edit {
     font-size: 16px;
     width: 100px;
+}
+
+.param-name {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+
+    .param-delete {
+        margin-right: 24px;
+        padding: 2px;
+        border-radius: 3px;
+        transition: background-color 0.2s linear;
+    }
+
+    .param-delete:hover {
+        background-color: rgb(255, 77, 79);
+    }
 }
 </style>
