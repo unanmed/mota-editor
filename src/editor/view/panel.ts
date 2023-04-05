@@ -21,6 +21,7 @@ export class Panel<T extends PanelType = PanelType> {
     type: PanelType;
     name: string;
     props: PanelProps[T];
+    style: Ref<string> = ref('');
     width!: number;
     height!: number;
     maxWidth?: number;
@@ -55,6 +56,11 @@ export class Panel<T extends PanelType = PanelType> {
     setMinSize(width?: number, height?: number) {
         width && (this.minWidth = width);
         height && (this.minHeight = height);
+        return this;
+    }
+
+    setStyle(style: string) {
+        this.style.value = style;
         return this;
     }
 

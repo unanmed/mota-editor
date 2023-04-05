@@ -9,7 +9,7 @@ declare const p: P;
 
 type ParamFormatFn = (p: Record<string, any>) => void;
 
-declare class EventParam<T> {
+interface EventParam<T> {
     /**
      * 参数值对象
      */
@@ -27,14 +27,14 @@ declare class EventParam<T> {
      * @param list 包装的属性列表
      * @param to 包装到的属性
      */
-    wrap(list: string[], to: string): this;
+    wrap(list: (keyof T)[], to: keyof T): this;
 
     /**
      * 将某个参数转换成一个值
      * @param p 属性
      * @param value 转换成的值
      */
-    replace(p: string, value: any): this;
+    replace(p: keyof T, value: any): this;
     /**
      * 将部分参数用一个对象替换下来
      * @param obj 要替换的对象
@@ -46,11 +46,11 @@ declare class EventParam<T> {
      * @param fn 过滤器函数，传入参数的值，返回false表示删除
      * @param p 要过滤的属性，不填视为全部
      */
-    filter(fn: (v: any) => boolean, p?: string | string[]): this;
+    filter(fn: (v: any) => boolean, p?: keyof T | (keyof T)[]): this;
     /**
      * 过滤部分值
      * @param value 要过滤掉的值
      * @param p 要过滤的属性，不填视为全部
      */
-    filter(value: any, p?: string | string[]): this;
+    filter(value: any, p?: keyof T | (keyof T)[]): this;
 }

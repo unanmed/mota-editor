@@ -33,7 +33,13 @@ export function addCode() {
 export function showCode(code: CodeController) {
     const panel = new Panel('code', '代码编辑器', code);
     code.panel = panel;
-    view.add(panel.setMinSize(400).setDefaultSize(800, 500).focus());
+    view.add(
+        panel
+            .setMinSize(400)
+            .setDefaultSize(800, 500)
+            .focus()
+            .setStyle('overflow: visible;')
+    );
     code.added = true;
 }
 

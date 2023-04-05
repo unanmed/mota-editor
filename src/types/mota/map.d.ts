@@ -645,7 +645,7 @@ interface Maps {
         data: { [P in T]: Partial<CompressedMap<P>> },
         floorId?: undefined,
         flags?: Record<string, any>
-    ): { [P in T]: ResolvedFloor<T> };
+    ): { [P in T]: ResolvedFloor<P> };
     /**
      * 加载某个楼层的信息
      * @param data 多个楼层的信息
@@ -1032,7 +1032,7 @@ interface Maps {
      * 根据给定的筛选函数搜索全部满足条件的图块
      * @example
      * // 搜索当前地图的所有门
-     * core.searchBlockWithFilter(function (block) { return block.event.id.endsWith('Door'); });
+     * core.searchBlockWithFilter(block => block.event.id.endsWith('Door'));
      * @param blockFilter 筛选函数，可接受block输入，应当返回一个boolean值
      * @param floorId 地图id，不填视为当前地图
      * @param showDisable 隐藏点是否计入，true表示计入
@@ -1337,7 +1337,9 @@ interface Maps {
 
     /**
      * 播放动画，注意即使指定了主角的坐标也不会跟随主角移动，如有需要请使用core.drawHeroAnimate(name, callback)函数
-     * @example core.drawAnimate('attack', core.nextX(), core.nextY(), false, core.vibrate); // 在主角面前一格播放普攻动画，动画停止后视野左右抖动1秒
+     * @example
+     * // 在主角面前一格播放普攻动画，动画停止后视野左右抖动1秒
+     * core.drawAnimate('attack', core.nextX(), core.nextY(), false, core.vibrate);
      * @param name 动画文件名，不含后缀
      * @param x 绝对横坐标
      * @param y 绝对纵坐标

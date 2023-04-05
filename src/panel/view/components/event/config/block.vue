@@ -1,6 +1,13 @@
 <template>
     <div class="block-config unique-scroll">
         <span class="config-text">事件集配置项</span>
+        <span class="config-text"
+            >注意这里的配置项只会影响编辑器，具体实现应该在样板中使用<span
+                style="font-family: code"
+            >
+                registerEvent </span
+            >实现</span
+        >
         <a-divider style="margin: 12px 0; background-color: #666"></a-divider>
         <div class="block-input">
             <span class="text">事件块颜色</span>
@@ -28,7 +35,7 @@
             ></a-input>
         </div>
         <div class="block-input">
-            <span class="text">事件集id</span>
+            <span class="text"><Required />事件集id</span>
             <a-divider type="vertical" class="divider"></a-divider>
             <a-input
                 class="input"
@@ -42,9 +49,7 @@
             <Table v-for="(item, key) of data.data" :n="1" use-slot>
                 <template #name> {{ key }} </template>
                 <div class="block-one">
-                    <span class="text"
-                        ><span style="color: lightcoral">*</span> 事件类型</span
-                    >
+                    <span class="text"><Required />事件类型</span>
                     <a-divider type="vertical" class="divider"></a-divider>
                     <a-input class="input" v-model:value="item.type"></a-input>
                 </div>
@@ -56,7 +61,9 @@
                 <div class="block-one">
                     <span class="text">序列化代码</span>
                     <a-divider type="vertical" class="divider"></a-divider>
-                    <a-button class="button">编辑</a-button>
+                    <a-button class="button" @click="editStringify(item)"
+                        >编辑</a-button
+                    >
                 </div>
                 <Table :n="2" use-slot>
                     <template #name>参数列表</template>
@@ -65,6 +72,7 @@
                             v-for="(p, i) in item.params"
                             :param="p"
                             :index="i"
+                            :path="`${block.name}/param/${i}`"
                         ></Param>
                     </template>
                 </Table>
@@ -74,17 +82,32 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
 import { EventBlockConfig } from '../../../event/config';
-import { RightOutlined } from '@ant-design/icons-vue';
+import { MotaEventInfo } from '../../../event/event';
 import Table from '../../table/table.vue';
 import Param from './param/param.vue';
+import { Required } from '../../../../components/utils';
+import { addCodeFile } from '../../code/code';
+import { Uri } from 'monaco-editor';
+import { generateStringifyDeclaration } from './declare';
 
 const props = defineProps<{
     block: EventBlockConfig;
 }>();
 
 const data = props.block.data;
+
+async function editStringify(block: MotaEventInfo) {
+    const content = (block.format ?? []).join('\n');
+    const uri = new Uri().with({
+        scheme: 'eventConfig',
+        path: `${props.block.name}/format`
+    });
+    const file = addCodeFile('序列化代码', content, 'javascript', uri);
+    const d = await generateStringifyDeclaration(block);
+
+    file?.setExtraLib([d]);
+}
 </script>
 
 <style lang="less" scoped>

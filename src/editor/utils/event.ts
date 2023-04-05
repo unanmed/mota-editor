@@ -8,11 +8,15 @@ export class EventEmitter<Event> {
         this.event[type]!.push(fn);
     }
 
-    off<K extends keyof Event>(type: K, fn: Event[K]): void;
+    off<K extends keyof Event>(type: K, fn: Event[K] | 'all'): void;
     off(type: 'all'): void;
     off(type: string, fn?: any) {
         if (type === 'all') this.event = {};
         else {
+            if (fn === 'all') {
+                this.event[type as keyof Event] = [];
+                return;
+            }
             const e = this.event[type as keyof Event];
             if (!e) return;
             const index = e.indexOf(fn);

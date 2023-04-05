@@ -4,7 +4,12 @@ import { projectInfo } from '../../../../editor/project/project';
 import { saveByScheme, saveData } from '../../../../editor/project/save';
 import { view } from '../../../../editor/view/control';
 import { addCode, addSelection, showCode, showSelection } from '../../control';
-import { codeList, createCodeFile, CodeController } from '../code/code';
+import {
+    codeList,
+    createCodeFile,
+    CodeController,
+    addCodeFile
+} from '../code/code';
 import { MultiItem } from '../multi/multi';
 import {
     selectionList,
@@ -56,15 +61,8 @@ export function buttonEdit(props: TableProps, uri: Uri, content: any) {
         type === 'number'
     ) {
         const lang = type === 'code' || type === 'number' ? 'javascript' : type;
-        const editor = codeList[0] ?? addCode();
-        if (!editor) return;
-
         const content = getTableValue(uri, data.type);
-        const file = createCodeFile(data.text, content, lang, uri);
-        editor.add(file);
-        onTableSave(file, data.type);
-
-        if (!editor.added) tryShowCode(editor);
+        addCodeFile(data.text, content, lang, uri);
     } else if (type === 'select') {
         const select = selectionList[0] ?? addSelection();
         if (!select) return;
@@ -91,6 +89,7 @@ function getTableValue(uri: Uri, type: TableElement['type'] = 'code') {
 
 function onTableSave(file: MultiItem, type: TableElement['type'] = 'code') {
     const { root, lastKey: key, info } = getTableObject(file.uri);
+    file.off('save', 'all');
     file.on('save', async (content: any) => {
         const regexp = info.regexp;
         const data = getParsedData(content, type, file);
@@ -121,7 +120,7 @@ function getParsedData(data: any, type: TableType, item: MultiItem) {
     }
 }
 
-function tryShowCode(editor: CodeController) {
+export function tryShowCode(editor: CodeController) {
     const panel = view.list.find(v => v.type === 'code');
     panel?.close();
     showCode(editor);

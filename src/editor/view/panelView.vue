@@ -41,7 +41,7 @@
         </div>
         <div
             class="panel-content unique-scroll"
-            :style="{ borderColor }"
+            :style="`border-color: ${borderColor};` + panel.style.value"
             v-if="!mined"
         >
             <Panel

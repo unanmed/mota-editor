@@ -3,9 +3,7 @@
         <Table :n="1" use-slot>
             <template #name>第 {{ index + 1 }} 个参数</template>
             <div class="block-one">
-                <span class="text"
-                    ><span style="color: lightcoral">*</span> 参数类型</span
-                >
+                <span class="text"><Required />参数类型</span>
                 <a-divider class="divider" type="vertical"></a-divider>
                 <a-select class="block-select" v-model:value="param.type">
                     <a-select-option
@@ -52,7 +50,20 @@
                     <div class="block-one">
                         <span class="text">允许的事件块</span>
                         <a-divider class="divider" type="vertical"></a-divider>
-                        <a-button class="block-edit">编辑</a-button>
+                        <a-button
+                            class="block-edit"
+                            @click="
+                                addCode(
+                                    '允许的事件块',
+                                    `/required`,
+                                    'json',
+                                    param,
+                                    'require',
+                                    []
+                                )
+                            "
+                            >编辑</a-button
+                        >
                     </div>
                 </template>
                 <template v-if="param.type === 'select'">
@@ -113,7 +124,20 @@
                                     class="divider"
                                     type="vertical"
                                 ></a-divider>
-                                <a-button class="block-edit">编辑</a-button>
+                                <a-button
+                                    class="block-edit"
+                                    @click="
+                                        addCode(
+                                            '抛出错误',
+                                            `/error/${i}/throw`,
+                                            'text',
+                                            e,
+                                            'throw',
+                                            []
+                                        )
+                                    "
+                                    >编辑</a-button
+                                >
                             </div>
                         </Table>
                     </template>
@@ -128,10 +152,14 @@ import { ref } from 'vue';
 import { MotaEventParam, typeName } from '../../../../event/event';
 import Table from '../../../table/table.vue';
 import { debounce } from 'lodash';
+import { Required } from '../../../../../components/utils';
+import { CodeFormat, addCodeFile } from '../../../code/code';
+import { Uri } from 'monaco-editor';
 
 const props = defineProps<{
     param: MotaEventParam;
     index: number;
+    path: string;
 }>();
 
 const defaultValue = ref(JSON.stringify(props.param.default));
@@ -151,6 +179,28 @@ const onDefaultValueChange = debounce(() => {
         defaultError.value = true;
     }
 }, 500);
+
+function addCode(
+    name: string,
+    path: string,
+    type: CodeFormat,
+    root: any,
+    key: string,
+    defaults?: any
+) {
+    const value = root[key];
+    const isArr = value instanceof Array;
+    const content = isArr
+        ? value.join('\n')
+        : type === 'json'
+        ? JSON.stringify(value ?? defaults)
+        : value ?? defaults;
+    const uri = new Uri().with({
+        scheme: 'eventConfig',
+        path: props.path + '/' + path
+    });
+    addCodeFile(name, content, type, uri);
+}
 </script>
 
 <style lang="less" scoped>

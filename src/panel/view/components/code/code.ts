@@ -3,15 +3,16 @@ import * as monaco from 'monaco-editor';
 import { Panel } from '../../../../editor/view/panel';
 import { MultiController, MultiItem } from '../multi/multi';
 import { spliceElement } from '../../../../editor/utils/utils';
+import { addCode } from '../../control';
+import { tryShowCode } from '../table/tableEdit';
+import { isNil } from 'lodash';
 
-type CodeFormat = 'javascript' | 'text' | 'json';
+export type CodeFormat = 'javascript' | 'text' | 'json';
 
 const fileMap = new Map<string, CodeFile>();
 
 // 代码编辑器，处理文件列表
 export class CodeController extends MultiController<CodeFile> {
-    selectStack: string[] = [];
-
     constructor() {
         super();
         codeList.push(this);
@@ -19,6 +20,13 @@ export class CodeController extends MultiController<CodeFile> {
             'select',
             (index, view: monaco.editor.ICodeEditorViewState | null) => {
                 if (view) this.list[this.selected.value].view = view;
+                const file = this.list[index];
+                const lib = file.extraLib;
+                this.list.forEach(v => (v.selected = false));
+                file.selected = true;
+                monaco.languages.typescript.javascriptDefaults.setExtraLibs(
+                    lib.map(v => ({ content: v }))
+                );
             }
         );
         this.on(
@@ -78,6 +86,8 @@ export class CodeFile extends MultiItem<string> {
     canWatch: boolean = true;
     extraLib: string[] = [];
 
+    selected: boolean = false;
+
     constructor(
         name: string,
         content: string,
@@ -109,14 +119,29 @@ export class CodeFile extends MultiItem<string> {
 
     addExtraLib(...content: string[]) {
         this.extraLib.push(...content);
+        if (this.selected) {
+            this.setLib();
+        }
     }
 
     removeExtraLib(content: string) {
         spliceElement(this.extraLib, content);
+        if (this.selected) {
+            this.setLib();
+        }
     }
 
     setExtraLib(content: string[]) {
         this.extraLib = content;
+        if (this.selected) {
+            this.setLib();
+        }
+    }
+
+    setLib() {
+        monaco.languages.typescript.javascriptDefaults.setExtraLibs(
+            this.extraLib.map(v => ({ content: v }))
+        );
     }
 }
 
@@ -140,4 +165,22 @@ export function getFormatedString(
     if (type === 'json' || type === 'number')
         return JSON.stringify(data, void 0, 4);
     else return data as string;
+}
+
+export function addCodeFile(
+    name: string,
+    content: string,
+    type: CodeFormat,
+    uri: monaco.Uri,
+    defaults?: string
+) {
+    const editor = codeList[0] ?? addCode();
+    if (!editor) return;
+    if (!isNil(defaults)) content ??= defaults;
+
+    const file = createCodeFile(name, content, type, uri);
+    editor.add(file);
+
+    if (!editor.added) tryShowCode(editor);
+    return file;
 }

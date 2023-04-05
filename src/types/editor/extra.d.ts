@@ -5,7 +5,7 @@ interface ExtraHandler {
     readl(dir: string, defaults?: string): Promise<[string, Uint8Array][]>;
     readl(
         dir: string,
-        defultas?: string,
+        defaults?: string,
         encoding: BufferEncoding
     ): Promise<[string, string][]>;
 }
