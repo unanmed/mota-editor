@@ -22,6 +22,7 @@
                     spellcheck="false"
                     class="input-color-text"
                     v-model:value="data.color"
+                    @change="block.emitSave()"
                 ></a-input>
             </span>
         </div>
@@ -32,6 +33,7 @@
                 class="input"
                 v-model:value="data.text"
                 spellcheck="false"
+                @change="block.emitSave()"
             ></a-input>
         </div>
         <div class="block-input">
@@ -41,6 +43,7 @@
                 class="input"
                 v-model:value="data.id"
                 spellcheck="false"
+                @change="block.emitSave()"
             ></a-input>
         </div>
         <a-divider style="margin: 12px 0; background-color: #666"></a-divider>
@@ -51,12 +54,20 @@
                 <div class="block-one">
                     <span class="text"><Required />事件类型</span>
                     <a-divider type="vertical" class="divider"></a-divider>
-                    <a-input class="input" v-model:value="item.type"></a-input>
+                    <a-input
+                        class="input"
+                        v-model:value="item.type"
+                        @change="block.emitSave()"
+                    ></a-input>
                 </div>
                 <div class="block-one">
                     <span class="text">事件名称</span>
                     <a-divider type="vertical" class="divider"></a-divider>
-                    <a-input class="input" v-model:value="item.text"></a-input>
+                    <a-input
+                        class="input"
+                        v-model:value="item.text"
+                        @change="block.emitSave()"
+                    ></a-input>
                 </div>
                 <div class="block-one">
                     <span class="text">序列化代码</span>
@@ -73,6 +84,7 @@
                             :param="p"
                             :index="i"
                             :path="`${block.name}/param/${i}`"
+                            :block="block"
                         ></Param>
                     </template>
                 </Table>
@@ -98,15 +110,21 @@ const props = defineProps<{
 const data = props.block.data;
 
 async function editStringify(block: MotaEventInfo) {
-    const content = (block.format ?? []).join('\n');
+    const content = (block.format ?? ['return params.format();']).join('\n');
     const uri = new Uri().with({
         scheme: 'eventConfig',
-        path: `${props.block.name}/format`
+        path: `${block.type}/format`
     });
-    const file = addCodeFile('序列化代码', content, 'javascript', uri);
+    const file = addCodeFile(`序列化代码`, content, 'javascript', uri);
+    if (!file) return;
     const d = await generateStringifyDeclaration(block);
 
-    file?.setExtraLib([d]);
+    file.setExtraLib([d]);
+    file.on('save', async content => {
+        block.format = content.split('\n');
+        props.block.emitSave();
+        return true;
+    });
 }
 </script>
 

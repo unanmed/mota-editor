@@ -2,7 +2,8 @@ import { Uri } from 'monaco-editor';
 import { MotaEventInfo, MotaEventParamType } from './event';
 import { projectInfo } from '../../../editor/project/project';
 import { MultiItem } from '../components/multi/multi';
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
+import { debounce } from 'lodash';
 
 export type EventConfigType = keyof MotaEventConfigMap;
 
@@ -48,21 +49,23 @@ export abstract class EventConfig<
 
     abstract toJSON(): string;
 
-    save(): void {
+    save = () => {
         const content = this.toJSON();
         this.doSave(content);
-    }
+    };
+
+    emitSave = debounce(this.save, 500);
 
     set(config: Partial<Omit<MotaEventConfigMap[T], 'type'>>): this {
         Object.assign(this, config);
         return this;
     }
 
-    async onsave(content: any) {
+    onsave = async (content: any) => {
         const path = projectInfo.project!.data.path + '/' + this.uri.path;
         window.editor.file.write(path, content, 'utf-8');
         return true;
-    }
+    };
 }
 
 export class EventParamDefaults extends EventConfig<'paramDefaults'> {

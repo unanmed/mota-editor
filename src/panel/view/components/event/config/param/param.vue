@@ -22,6 +22,7 @@
                 <a-input
                     class="block-input"
                     v-model:value="param.text"
+                    @change="block.emitSave()"
                 ></a-input>
             </div>
             <template v-if="param.type !== 'comment'">
@@ -31,6 +32,7 @@
                     <a-input
                         class="block-input"
                         v-model:value="param.key"
+                        @change="block.emitSave()"
                     ></a-input>
                 </div>
                 <div class="block-one">
@@ -40,7 +42,7 @@
                         class="block-input"
                         :error="defaultError"
                         v-model:value="defaultValue"
-                        @change="onDefaultValueChange"
+                        @change="onDefaultValueChange()"
                     ></a-input>
                     <span class="block-input-error" v-show="defaultError"
                         >输入值不合法</span
@@ -85,6 +87,7 @@
                                     <a-input
                                         class="block-input"
                                         v-model:value="param.value[i]"
+                                        @change="block.emitSave()"
                                     ></a-input>
                                 </div>
                                 <div class="block-one">
@@ -96,6 +99,7 @@
                                     <a-input
                                         class="block-input"
                                         v-model:value="param.show[i]"
+                                        @change="block.emitSave()"
                                     ></a-input>
                                 </div>
                             </Table>
@@ -116,6 +120,7 @@
                                 <a-input
                                     class="block-input"
                                     v-model:value="e.regexp"
+                                    @change="block.emitSave()"
                                 ></a-input>
                             </div>
                             <div class="block-one">
@@ -155,11 +160,13 @@ import { debounce } from 'lodash';
 import { Required } from '../../../../../components/utils';
 import { CodeFormat, addCodeFile } from '../../../code/code';
 import { Uri } from 'monaco-editor';
+import { EventBlockConfig } from '../../../../event/config';
 
 const props = defineProps<{
     param: MotaEventParam;
     index: number;
     path: string;
+    block: EventBlockConfig;
 }>();
 
 const defaultValue = ref(JSON.stringify(props.param.default));
@@ -169,12 +176,14 @@ const onDefaultValueChange = debounce(() => {
     if (defaultValue.value === '') {
         delete props.param.default;
         defaultError.value = false;
+        props.block.emitSave();
         return;
     }
     try {
         const value = JSON.parse(defaultValue.value);
         props.param.default = value;
         defaultError.value = false;
+        props.block.emitSave();
     } catch {
         defaultError.value = true;
     }
@@ -199,7 +208,15 @@ function addCode(
         scheme: 'eventConfig',
         path: props.path + '/' + path
     });
-    addCodeFile(name, content, type, uri);
+    const file = addCodeFile(name, content, type, uri);
+
+    file?.on('save', async content => {
+        if (type === 'json') root[key] = JSON.parse(content);
+        else if (isArr) root[key] = content.split('\n');
+        else root[key] = content;
+        props.block.emitSave();
+        return true;
+    });
 }
 </script>
 

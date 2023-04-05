@@ -188,6 +188,7 @@ onUnmounted(() => {
     left: 0;
     top: 0;
     font-size: 32px;
+    left: -1px;
 }
 
 .code-empty {

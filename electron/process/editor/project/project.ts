@@ -2,6 +2,8 @@ import { resolve } from 'path';
 import { includesAll } from '../../../utils/extend';
 import fs from 'fs/promises';
 import { first } from '../../config/firstConfig';
+import { copy } from 'fs-extra';
+import { app } from 'electron';
 
 export interface FileData {
     name: string;
@@ -107,6 +109,7 @@ export class MotaProject {
         if (!this.valid) {
             return '不合法的目录结构，请在资源管理器中修改或新建一个项目';
         }
+        await this.checkConfig();
 
         // 素材等
         const floors = await this.readDirContent(
@@ -252,6 +255,18 @@ export class MotaProject {
         await first.writeToFile();
 
         return project;
+    }
+
+    async checkConfig() {
+        try {
+            await fs.stat(resolve(this.dir, '_editor'));
+        } catch {
+            const client = import.meta.env.DEV ? 'public' : 'resources/assets';
+            await copy(
+                resolve(app.getAppPath(), client),
+                resolve(this.dir, '_editor')
+            );
+        }
     }
 
     /**

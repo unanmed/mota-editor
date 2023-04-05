@@ -6,6 +6,7 @@ import {
     EventParserConfig
 } from '../../../event/config';
 import { MultiController, MultiItem } from '../../multi/multi';
+import { projectInfo } from '../../../../../editor/project/project';
 
 export class EventConfigController extends MultiController<EventConfig> {
     constructor() {
