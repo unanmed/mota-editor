@@ -55,6 +55,7 @@
                     <span class="text"><Required />事件类型</span>
                     <a-divider type="vertical" class="divider"></a-divider>
                     <a-input
+                        spellcheck="false"
                         class="input"
                         v-model:value="item.type"
                         @change="block.emitSave()"
@@ -64,6 +65,7 @@
                     <span class="text">事件名称</span>
                     <a-divider type="vertical" class="divider"></a-divider>
                     <a-input
+                        spellcheck="false"
                         class="input"
                         v-model:value="item.text"
                         @change="block.emitSave()"
@@ -86,13 +88,10 @@
                             :path="`${block.name}/param/${i}`"
                             :block="block"
                             :item="item"
-                            :key="p.key ?? i"
                         ></Param>
                     </template>
-                    <div class="block-one param-add">
-                        <span class="text" @click="addParam(item)"
-                            >+ 新增参数</span
-                        >
+                    <div class="block-one param-add" @click="addParam(item)">
+                        <span class="text">+ 新增参数</span>
                     </div>
                 </Table>
             </Table>

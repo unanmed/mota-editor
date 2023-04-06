@@ -3,7 +3,11 @@
         <Table :n="1" use-slot>
             <template #name>
                 <div class="param-name">
-                    <span>第 {{ index + 1 }} 个参数</span>
+                    <span
+                        >第 {{ index + 1 }} 个参数&nbsp;&nbsp;&nbsp;&nbsp;{{
+                            typeName[param.type]
+                        }}&nbsp;&nbsp;&nbsp;&nbsp;{{ param.key }}</span
+                    >
                     <DeleteOutlined
                         class="param-delete"
                         @click.stop="deleteParam"
@@ -31,6 +35,7 @@
                     class="block-input"
                     v-model:value="param.text"
                     @change="block.emitSave()"
+                    spellcheck="false"
                 ></a-input>
             </div>
             <template v-if="param.type !== 'comment'">
@@ -41,6 +46,7 @@
                         class="block-input"
                         v-model:value="param.key"
                         @change="block.emitSave()"
+                        spellcheck="false"
                     ></a-input>
                 </div>
                 <div class="block-one">
@@ -51,6 +57,7 @@
                         :error="defaultError"
                         v-model:value="defaultValue"
                         @change="onDefaultValueChange()"
+                        spellcheck="false"
                     ></a-input>
                     <span class="block-input-error" v-show="defaultError"
                         >输入值不合法</span
@@ -85,7 +92,18 @@
                                 use-slot
                                 v-for="(v, i) of param.value"
                             >
-                                <template #name>第 {{ i + 1 }} 个选项</template>
+                                <template #name
+                                    ><div class="param-name">
+                                        <span
+                                            >第
+                                            {{ i + 1 }}
+                                            个选项</span
+                                        >
+                                        <DeleteOutlined
+                                            class="param-delete"
+                                            @click.stop="deleteSelect(i)"
+                                        /></div
+                                ></template>
                                 <div class="block-one">
                                     <span class="text">选项的值</span>
                                     <a-divider
@@ -96,6 +114,7 @@
                                         class="block-input"
                                         v-model:value="param.value[i]"
                                         @change="block.emitSave()"
+                                        spellcheck="false"
                                     ></a-input>
                                 </div>
                                 <div class="block-one">
@@ -108,17 +127,32 @@
                                         class="block-input"
                                         v-model:value="param.show[i]"
                                         @change="block.emitSave()"
+                                        spellcheck="false"
                                     ></a-input>
                                 </div>
                             </Table>
                         </template>
+                        <div class="block-one param-add" @click="addSelect">
+                            <span class="text">+ 新增选项</span>
+                        </div>
                     </Table>
                 </template>
                 <Table :n="2" use-slot>
                     <template #name>错误信息</template>
                     <template v-if="!!param.error">
                         <Table v-for="(e, i) of param.error" :n="1" use-slot>
-                            <template #name>第 {{ i + 1 }} 个错误信息</template>
+                            <template #name
+                                ><div class="param-name">
+                                    <span
+                                        >第
+                                        {{ i + 1 }}
+                                        个错误信息</span
+                                    >
+                                    <DeleteOutlined
+                                        class="param-delete"
+                                        @click.stop="deleteError(i)"
+                                    /></div
+                            ></template>
                             <div class="block-one">
                                 <span class="text">匹配正则</span>
                                 <a-divider
@@ -129,6 +163,7 @@
                                     class="block-input"
                                     v-model:value="e.regexp"
                                     @change="block.emitSave()"
+                                    spellcheck="false"
                                 ></a-input>
                             </div>
                             <div class="block-one">
@@ -154,6 +189,9 @@
                             </div>
                         </Table>
                     </template>
+                    <div class="block-one param-add" @click="addError">
+                        <span class="text">+ 新增报错</span>
+                    </div>
                 </Table>
             </template>
         </Table>
@@ -237,6 +275,34 @@ function deleteParam() {
     props.item.params?.splice(props.index, 1);
     props.block.emitSave();
 }
+
+function deleteSelect(index: number) {
+    props.param.value?.splice(index, 1);
+    props.param.show?.splice(index, 1);
+    props.block.emitSave();
+}
+
+function addSelect() {
+    props.param.value ??= [];
+    props.param.show ??= [];
+    props.param.value.push('value');
+    props.param.show.push('显示文字');
+    props.block.emitSave();
+}
+
+function deleteError(index: number) {
+    props.param.error?.splice(index, 1);
+    props.block.emitSave();
+}
+
+function addError() {
+    props.param.error ??= [];
+    props.param.error.push({
+        regexp: '^$',
+        throw: ['Error']
+    });
+    props.block.emitSave();
+}
 </script>
 
 <style lang="less" scoped>
@@ -289,5 +355,11 @@ function deleteParam() {
     .param-delete:hover {
         background-color: rgb(255, 77, 79);
     }
+}
+
+.param-add {
+    background-color: #2e5e26;
+    border-bottom: 1px solid #888;
+    cursor: pointer;
 }
 </style>
