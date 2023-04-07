@@ -85,7 +85,7 @@
                             v-for="(p, i) in item.params"
                             :param="p"
                             :index="i"
-                            :path="`${block.name}/param/${i}`"
+                            :path="`${block.name}/${key}/param/${i}`"
                             :block="block"
                             :item="item"
                         ></Param>

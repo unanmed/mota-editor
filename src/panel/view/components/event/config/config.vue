@@ -43,6 +43,7 @@ const item = computed(() => props.config.list[selected.value]);
 onUnmounted(() => {
     props.config.added = false;
     props.config.list.splice(0);
+    props.config.close();
 });
 </script>
 

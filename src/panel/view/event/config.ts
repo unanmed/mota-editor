@@ -109,7 +109,14 @@ export class EventBlockConfig extends EventConfig<'eventBlock'> {
         return this;
     }
 
-    update(content: string): void {}
+    update(content: string): void {
+        const json = JSON.parse(content);
+
+        for (const [key, value] of Object.entries(json)) {
+            // @ts-ignore
+            this.data[key] = reactive(value);
+        }
+    }
 }
 
 export class EventParserConfig extends EventConfig<'eventParser'> {

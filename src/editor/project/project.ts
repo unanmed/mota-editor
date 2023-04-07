@@ -16,6 +16,7 @@ import {
 import { EventEmitter } from '../utils/event';
 import { SocketHandler, WebSocketMessageData } from './socket';
 import { emitFileChange, updateMainData } from './update/main';
+import { onEventConfigChange } from './update/eventConfig';
 
 export const tables: Record<string, TableElement> = {};
 export const watchFolders: Record<string, string> = {};
@@ -116,14 +117,17 @@ export class Project extends EventEmitter<ProjectEvent> {
                 this.parseJSONEDMotaData(data.content.data as string)
             );
         }
+        onEventConfigChange(data);
     }
 
     private handleAdd(data: WebSocketMessageData['add']) {
         emitFileChange(data.file, this);
+        onEventConfigChange(data);
     }
 
     private handleRemove(data: WebSocketMessageData['remove']) {
         emitFileChange(data.file, this);
+        onEventConfigChange(data);
     }
 
     private onTableChange() {

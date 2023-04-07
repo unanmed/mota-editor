@@ -6,12 +6,13 @@ import {
     EventParserConfig
 } from '../../../event/config';
 import { MultiController, MultiItem } from '../../multi/multi';
-import { projectInfo } from '../../../../../editor/project/project';
+import { spliceElement } from '../../../../../editor/utils/utils';
 
 export class EventConfigController extends MultiController<EventConfig> {
     constructor() {
         super();
         this.getAllConfig();
+        configs.push(this);
     }
 
     async getAllConfig() {
@@ -38,14 +39,21 @@ export class EventConfigController extends MultiController<EventConfig> {
         }
     }
 
-    close(): void {}
+    close(): void {
+        spliceElement(configs, this);
+    }
 }
 
-function parseConfig(name: string, config: string): EventConfig | undefined {
+export function parseConfig(
+    name: string,
+    config: string
+): EventConfig | undefined {
     const uri = new Uri().with({
         scheme: 'eventConfig',
         path: `_editor/event/${name}`
     });
+    console.log(uri.toString());
+
     if (name.endsWith('json')) {
         // json格式
         const json = JSON.parse(config);
@@ -72,3 +80,5 @@ function parseConfig(name: string, config: string): EventConfig | undefined {
         });
     }
 }
+
+export const configs: EventConfigController[] = [];
