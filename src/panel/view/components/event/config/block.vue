@@ -119,7 +119,7 @@ async function editStringify(block: MotaEventInfo) {
     const content = (block.format ?? ['return params.format();']).join('\n');
     const uri = new Uri().with({
         scheme: 'eventConfig',
-        path: `${block.type}/format`
+        path: `${props.block.name}/${block.type}/format`
     });
     const file = addCodeFile(`序列化代码`, content, 'javascript', uri);
     if (!file) return;

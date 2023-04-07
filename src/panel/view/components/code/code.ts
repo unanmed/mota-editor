@@ -83,7 +83,6 @@ export class CodeFile extends MultiItem<string> {
     model: monaco.editor.IModel;
     view?: monaco.editor.ICodeEditorViewState;
 
-    canWatch: boolean = true;
     extraLib: string[] = [];
 
     selected: boolean = false;

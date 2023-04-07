@@ -10,7 +10,7 @@
         <div class="parser-edit">
             <span class="text">解析器代码</span>
             <a-divider type="vertical" class="divider"></a-divider>
-            <a-button class="edit-button">编辑</a-button>
+            <a-button class="edit-button" @click="edit">编辑</a-button>
         </div>
     </div>
 </template>

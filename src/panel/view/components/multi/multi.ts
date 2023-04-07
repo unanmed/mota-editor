@@ -76,7 +76,7 @@ export abstract class MultiItem<Content = any, Event = {}> extends EventEmitter<
 
     enableWatch = debounce(() => {
         this.canWatch = true;
-    }, 100);
+    }, 750);
 
     constructor(uri: Uri) {
         super();

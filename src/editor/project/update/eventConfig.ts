@@ -38,10 +38,16 @@ export function onEventConfigChange(
             }
         }
     });
+    const fileName = file.file.split(/\/|\\/).at(-1)!;
     codeList.forEach(v => {
         for (let i = 0; i < v.list.length; i++) {
             const code = v.list[i];
-            if (code.uri.scheme === 'eventConfig') {
+            if (code.uri.scheme !== 'eventConfig' || !code.canWatch) continue;
+            const f = code.uri.path.split('/')[0];
+            if (f === fileName && file.type === 'change') {
+                code.model.setValue(file.content.data as string);
+                code.saved.value = true;
+            } else if (f === fileName) {
                 v.remove(i);
                 i--;
             }
