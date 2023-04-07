@@ -20,6 +20,10 @@
                 v-if="item?.type === 'eventBlock'"
                 :block="(item as EventBlockConfig)"
             ></Block>
+            <Parser
+                v-else-if="item?.type === 'eventParser'"
+                :parser="(item as EventParserConfig)"
+            ></Parser>
         </template>
     </Multi>
 </template>
@@ -30,7 +34,8 @@ import { EventConfigController } from './config';
 import { DeleteOutlined } from '@ant-design/icons-vue';
 import Block from './block.vue';
 import { computed, onUnmounted } from 'vue';
-import { EventBlockConfig } from '../../../event/config';
+import { EventBlockConfig, EventParserConfig } from '../../../event/config';
+import Parser from './parser.vue';
 
 const props = defineProps<{
     config: EventConfigController;
