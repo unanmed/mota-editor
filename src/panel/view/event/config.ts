@@ -114,7 +114,7 @@ export class EventBlockConfig extends EventConfig<'eventBlock'> {
 
         for (const [key, value] of Object.entries(json)) {
             // @ts-ignore
-            this.data[key] = reactive(value);
+            this.data[key] = value;
         }
     }
 }

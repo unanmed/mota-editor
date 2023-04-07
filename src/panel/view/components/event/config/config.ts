@@ -52,7 +52,6 @@ export function parseConfig(
         scheme: 'eventConfig',
         path: `_editor/event/${name}`
     });
-    console.log(uri.toString());
 
     if (name.endsWith('json')) {
         // json格式
