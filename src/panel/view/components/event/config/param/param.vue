@@ -312,17 +312,19 @@ function addError() {
 
 .block-select {
     font-size: 16px;
-    width: calc(100% - 184px);
+    width: calc(100% - 200px);
     max-width: 200px;
+    margin-left: 15px;
 }
 
 .block-input {
     font-size: 16px;
-    width: calc(100% - 184px);
+    width: calc(100% - 200px);
+    margin-left: 15px;
 }
 
 .block-input[error] {
-    width: calc(100% - 284px);
+    width: calc(100% - 300px);
 }
 
 .block-input[error='true'] {
@@ -337,6 +339,7 @@ function addError() {
 .block-edit {
     font-size: 16px;
     width: 100px;
+    margin-left: 15px;
 }
 
 .param-name {
