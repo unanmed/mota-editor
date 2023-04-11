@@ -10,7 +10,7 @@ export type EventConfigType = keyof MotaEventConfigMap;
 export interface MotaEventDefaults {
     type: 'paramDefaults';
     data: Partial<Record<MotaEventParamType, any>>;
-    blockData: Record<string, any>;
+    specific: Record<string, any>;
 }
 
 export interface MotaEventBlock {
@@ -69,15 +69,17 @@ export abstract class EventConfig<
 }
 
 export class EventParamDefaults extends EventConfig<'paramDefaults'> {
-    data: Partial<Record<MotaEventParamType, any>> = {};
-    blockData: Record<string, any> = {};
+    data: Omit<MotaEventDefaults, 'type'> = reactive({
+        data: {},
+        specific: {}
+    });
 
     toJSON() {
         return JSON.stringify(
             {
                 type: this.type,
-                data: this.data,
-                blockData: this.blockData
+                data: this.data.data,
+                specific: this.data.specific
             },
             void 0,
             4

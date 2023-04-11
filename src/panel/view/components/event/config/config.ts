@@ -60,7 +60,7 @@ export function parseConfig(
         if (json.type === 'paramDefaults') {
             return new EventParamDefaults('paramDefaults', name, uri).set({
                 data: json.data,
-                blockData: json.blockData
+                specific: json.blockData
             });
         } else if (json.type === 'eventBlock') {
             return new EventBlockConfig('eventBlock', name, uri).set({

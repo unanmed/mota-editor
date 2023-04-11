@@ -50,7 +50,34 @@
         <Table :n="0" use-slot>
             <template #name> 事件集数据 </template>
             <Table v-for="(item, key) of data.data" :n="1" use-slot>
-                <template #name> {{ key }} </template>
+                <template #name>
+                    <div class="data-key">
+                        <div class="data-key-left">
+                            <input
+                                :id="`key-input-${key}`"
+                                class="key-input ant-input"
+                                :value="keyFocused === key ? keyEdit : key"
+                                spellcheck="false"
+                                @click.stop="
+                                    (keyFocused = key) && (keyEdit = key)
+                                "
+                                @input="
+                                    checkKey(
+                                        ($event.target as HTMLInputElement)
+                                            .value,
+                                        key
+                                    )
+                                "
+                                @blur="changeKey($event, key)"
+                            />
+                            <span class="key-error">{{ keyError[key] }}</span>
+                        </div>
+                        <DeleteOutlined
+                            class="data-delete"
+                            @click.stop="deleteData(key)"
+                        />
+                    </div>
+                </template>
                 <div class="block-one">
                     <span class="text"><Required />事件类型</span>
                     <a-divider type="vertical" class="divider"></a-divider>
@@ -95,6 +122,9 @@
                     </div>
                 </Table>
             </Table>
+            <div class="block-one param-add" @click="addData()">
+                <span class="text">+ 新增事件</span>
+            </div>
         </Table>
     </div>
 </template>
@@ -108,10 +138,17 @@ import { Required } from '../../../../components/utils';
 import { addCodeFile } from '../../code/code';
 import { Uri } from 'monaco-editor';
 import { generateStringifyDeclaration } from './declare';
+import { nextTick, onUpdated, reactive, ref } from 'vue';
+import { DeleteOutlined } from '@ant-design/icons-vue';
+import { DebouncedFunc, cloneDeep, debounce } from 'lodash';
 
 const props = defineProps<{
     block: EventBlockConfig;
 }>();
+
+const keyError: Record<string, string> = reactive({});
+const keyFocused = ref('');
+const keyEdit = ref('');
 
 const data = props.block.data;
 
@@ -139,6 +176,61 @@ function addParam(item: MotaEventInfo) {
         text: '显示文字'
     });
     props.block.emitSave();
+}
+
+const checkKey = debounce((key: string, origin: string) => {
+    keyEdit.value = key;
+    if (key === '') keyError[origin] = '事件id不能为空！';
+    else if (key in data.data && key !== origin) {
+        keyError[origin] = '事件id不能重复！';
+    } else if (key.includes('/') || key.includes('\\')) {
+        keyError[origin] = '事件id不能包含 "/" 或 "\\"！';
+    } else {
+        keyError[origin] = '';
+    }
+}, 500);
+
+function changeKey(ev: Event, from: string) {
+    const input = ev.target as HTMLInputElement;
+    keyEdit.value = '';
+    keyFocused.value = '';
+    if (keyError[from] !== '') {
+        if (from === '') {
+            delete data.data[''];
+        }
+        keyError[from] = '';
+        return;
+    }
+    input.blur();
+    const to = input.value;
+    if (from === to) return;
+    const obj = cloneDeep(data.data[from]);
+    delete data.data[from];
+    data.data[to] = obj;
+    props.block.emitSave();
+}
+
+const focusInput: DebouncedFunc<() => void> = debounce<() => void>(() => {
+    const input = document.getElementById('key-input-') as HTMLInputElement;
+    if (!input) return focusInput();
+    input.focus();
+    keyEdit.value = '';
+    keyFocused.value = '';
+    checkKey('', '');
+    checkKey.flush();
+}, 100);
+
+function addData() {
+    data.data[''] = {
+        type: 'type'
+    };
+    focusInput();
+}
+
+function deleteData(key: string) {
+    const c = confirm('确定要删除这个事件吗？');
+    if (!c) return;
+    delete data.data[key];
 }
 </script>
 
@@ -198,5 +290,48 @@ function addParam(item: MotaEventInfo) {
     background-color: #2e5e26;
     border-bottom: 1px solid #888;
     cursor: pointer;
+}
+
+.data-key {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .data-key-left {
+        width: calc(100% - 50px);
+        display: flex;
+        align-items: center;
+    }
+
+    .key-input {
+        width: calc(100% - 150px);
+        border-color: #888;
+        background-color: #222;
+        max-width: 200px;
+        font-size: 16px;
+    }
+
+    .key-input:hover,
+    .key-input:focus {
+        border-color: aqua;
+    }
+
+    .key-error {
+        color: lightcoral;
+        margin-left: 20px;
+        white-space: nowrap;
+    }
+
+    .data-delete {
+        margin-right: 24px;
+        padding: 2px;
+        border-radius: 3px;
+        transition: background-color 0.2s linear;
+    }
+
+    .data-delete:hover {
+        background-color: rgb(255, 77, 79);
+    }
 }
 </style>

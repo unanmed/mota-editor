@@ -2,7 +2,7 @@
     <div class="event-parser unique-scroll">
         <span class="config-text">事件解析器配置项</span>
         <span class="config-text"
-            >事件解析器用于将<span style="font-family: code"> json </span
+            >事件解析器用于将事件<span style="font-family: code"> json </span
             >转化为可以直接被事件渲染器渲染出来的对象。具体写法可参考编辑器自带的配置项。
             更多信息请参考编辑器使用手册</span
         >
